@@ -1,0 +1,569 @@
+# MMEB Training Dataset Configuration
+# Base layer for dataset variants
+# Public MMEB training mixture used by the BToks reproduction presets.
+# Naming Convention: Use `type` for registry building (per architecture.md)
+#
+# ============================================================================
+# MMEB Datasets (type: mmeb_train)
+# Runtime contract:
+# - Lance tables store source fields; Dataset.__getitem__ applies the configured
+#   transform into query, positive, and negative retrieval fields.
+# - Classification-like tasks render the image side with `<|image_pad|>` and
+#   use label text as the positive side.
+# - Text-only entries intentionally omit visual tokens so token counts remain
+#   compatible with text retrieval baselines.
+# - The `mmeb_train` loader owns subset parsing and specific render overrides
+#   such as WebQA and VisDial prompt handling.
+# ============================================================================
+
+ImageNet_1K:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nRepresent the given image for classification\n"
+  # example positive: "plane, carpenter's plane, woodworking plane\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: ImageNet_1K
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 1
+
+N24News:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: "{text}\\n"
+  # example query: "<|image_pad|>\nRepresent the given news image with the following caption for domain classification: Danai Gurira and André Holland in a theater at New York University, where they met in the Tisch Graduate Acting Program.\n"
+  # example positive: "Theater\n"
+  # example negative: "Global Business\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: N24News
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  weight: 1
+
+HatefulMemes:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: "{text}\\n"
+  # example query: "<|image_pad|>\nRepresent the given image for binary classification to determine whether it constitutes hateful speech or not\n"
+  # example positive: "Yes\n"
+  # example negative: "No\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: HatefulMemes
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  weight: 0.5
+
+VOC2007:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nIdentify the object shown in the image\n"
+  # example positive: "car\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: VOC2007
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 0.5
+
+SUN397:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nIdentify the scene shown in the image\n"
+  # example positive: "abbey\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: SUN397
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 0.5
+
+OK-VQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: "{text}\\n"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: What is the hairstyle of the blond called?\n"
+  # example positive: "pony tail\n"
+  # example negative: "husky\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: OK-VQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  weight: 0.5
+
+A-OKVQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: "{text}\\n"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: What is the man by the bags awaiting?\n"
+  # example positive: "cab\n"
+  # example negative: "train\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: A-OKVQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  weight: 0.5
+
+DocVQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: "{text}\\n"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: what is the date mentioned in this letter?\n"
+  # example positive: "1/8/93\n"
+  # example negative: "398,627.92\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: DocVQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  weight: 1
+
+InfographicsVQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: "{text}\\n"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: Which type of fonts offer better readability in printed works?\n"
+  # example positive: "serif fonts\n"
+  # example negative: "his, he, hers\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: InfographicsVQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  weight: 0.5
+
+ChartQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: "{text}\\n"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: Is the value of Favorable 38 in 2015?\n"
+  # example positive: "Yes\n"
+  # example negative: "No\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: ChartQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      whitespace_normalization: strip_trailing_horizontal
+    negative:
+      whitespace_normalization: strip_trailing_horizontal
+  weight: 0.5
+
+Visual7W:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: "{text}\\n"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: What is written on the white square on the bus?\n"
+  # example positive: "Fox's Ginger Biscuits.\n"
+  # example negative: "Mac's Macaroni Hut.\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: Visual7W
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  weight: 1
+
+VisDial:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: "<|image_pad|>\n"
+  # example query: "Represent the given dialogue about an image, which is used for image retrieval: Q:is this a child or adult\nA:adult\nQ:male or female\nA:male\nQ:are they inside or outside\nA:inside\nQ:are they laying on the floor\nA:yes, but there is a blanket in between them and the floor\nQ:is the floor carpeted or wooden\nA:it is tile\nQ:what color is the blanket\nA:red and white\nQ:what color is the tile\nA:orange red\nQ:what breed is the dog\nA:boxer\nQ:does the dog look healthy and happy\nA:yes\nQ:what color is the dog\nA:tan\n"
+  # example positive: "<|image_pad|>\nRepresent the given image\n"
+  # example negative: "<|image_pad|>\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: VisDial
+  transform:
+    query:
+      instruction_body_separator: newline
+      trailing_newline: normalize_blank_tail
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      visual_token_alignment: restore_if_empty
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  weight: 1
+
+CIRR:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nGiven an image, find a similar everyday image with the described changes: Many hamster together playing in a different background.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: CIRR
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 0.5
+
+VisualNews_t2i:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Retrieve an image of this news caption. Turkish President Tayyip Erdogan looks on after arriving at Esenboga Airport in Ankara Turkey June 8 2015 Turkey faced the prospect of weeks of political turmoil after the ruling AK Party lost its parliamentary majority REUTERSUmit Bektas.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: VisualNews_t2i
+  transform:
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 1
+
+VisualNews_i2t:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nFind a caption for the news in the given photo.\n"
+  # example positive: "Turkish President Tayyip Erdogan looks on after arriving at Esenboga Airport in Ankara Turkey June 8 2015 Turkey faced the prospect of weeks of political turmoil after the ruling AK Party lost its parliamentary majority REUTERSUmit Bektas.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: VisualNews_i2t
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 1
+
+MSCOCO_t2i:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find me an everyday image that matches the given caption: A teddy bear shop is equipped with a door guard teddy and a neighbor teddy above.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: MSCOCO_t2i
+  transform:
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 1
+
+MSCOCO_i2t:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nFind an image caption describing the given everyday image.\n"
+  # example positive: "A skateboarder in mid air following a jump form cincrete.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: MSCOCO_i2t
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 1
+
+NIGHTS:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nFind a day-to-day image that looks similar to the provided image.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: NIGHTS
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 0.5
+
+WebQA:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find a Wikipedia image that answers this question: Which body part is found on both a 1913 D Barber half and a 1914 Barber Quarter?\n"
+  # example positive: "<|image_pad|>\nRepresent the given Wikipedia image with related text information: 1913-D Barber half obverse.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: WebQA
+  transform:
+    query:
+      visual_token_alignment: strip_without_media
+      trailing_newline: ensure_single
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 0.5
+
+MSCOCO:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nSelect the portion of the image that isolates the object labeled as \"hot dog\"\n"
+  # example positive: "<|image_pad|>\nRepresent the given cropped image of the object\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: MSCOCO
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  weight: 1
+
+# ============================================================================
+# Document Retrieval Datasets (type: vidore_train, visrag_train)
+# - ViDoRe full view:
+#   query = "<|image_pad|>\\n{query}\\n"
+#   positive = "{answer}\\n"
+#   negative = ""
+# - VisRAG:
+#   query = "{source_prompt}{query}\\n"
+#   positive = "<|image_pad|>\\n{target_prompt}\\n"
+#   negative = ""
+# ============================================================================
+
+colpali_train_set:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nComparing panels a, b, c, and d, which statement best describes the data variance?\n"
+  # example positive: "D\n"
+  # example negative: ""
+  type: vidore_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/vidore_colpali_train_set
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: preserve
+    positive:
+      trailing_newline: preserve
+    negative:
+      empty: empty_multimodal_input
+  weight: 10
+
+visrag-indomain:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "This query is related to retrieving an infographic that visually presents statistical or factual information using charts, icons, and structured layouts. The retrieved image should contain the necessary visual elements to provide the best context for answering the query: which are the countries with Chinese speaking population other than China according to this infographic?\n"
+  # example positive: "<|image_pad|>\nAn infographic with structured data, charts, and annotations.\n"
+  # example negative: ""
+  # transform defaults supported by `visrag_train`:
+  #   transform.query.instructions.by_source
+  #   transform.query.instructions.fallback
+  #   transform.positive.instructions.by_source
+  #   transform.positive.instructions.fallback
+  type: visrag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/openbmb_VisRAG-Ret-Train-In-domain-data
+  dataset_name: VisRAG-Indomain-data
+  transform:
+    query:
+      instructions:
+        by_source:
+          NeurIPS Papers: "This query is about a research paper from NeurIPS, a leading AI/ML conference. The document contains technical discussions, methodologies, and findings. Identify relevant papers and sections that address the query: "
+          Textbooks: "This query is related to a college-level textbook, which provides structured explanations, definitions, and examples. Find the most relevant concepts or explanations that address the query: "
+          ICML Papers: "This query is about a research paper from ICML, a leading AI/ML conference. The document contains theoretical insights, experiments, and applications. Identify relevant papers and sections that best answer the query: "
+          Manuallib: "This query pertains to a product manual, which contains detailed technical specifications, usage instructions, and troubleshooting steps. Find the most relevant section that answers the query: "
+          ArxivQA: "This query is related to retrieving a relevant figure from an ArXiv research paper. The retrieved figure should contain scientific plots, mathematical visualizations, or experimental results that best address the query: "
+          ChartQA: "This query is related to retrieving a relevant chart that visually represents numerical or categorical data. The retrieved chart should contain bar graphs, line charts, or other visual elements necessary to analyze trends, compare values, or extract insights related to the query: "
+          MP-DocVQA: "This query is related to retrieving a relevant page from a multi-page document, such as reports, invoices, or research papers. The retrieved document should contain text, tables, or structured information necessary to answer the query: "
+          InfoVQA: "This query is related to retrieving an infographic that visually presents statistical or factual information using charts, icons, and structured layouts. The retrieved image should contain the necessary visual elements to provide the best context for answering the query: "
+          PlotQA: "This query relates to retrieving a relevant plot or chart that visually represents numerical data. The retrieved figure should contain the necessary information to analyze trends, compare values, or extract key insights related to the query: "
+          SlideVQA: "This query is related to retrieving a relevant presentation slide that visually presents structured information. The retrieved slide should contain the necessary text, charts, or graphics to provide the best answer to the query: "
+        fallback: ""
+      instruction_body_separator: none
+      trailing_newline: preserve
+    positive:
+      instructions:
+        by_source:
+          Textbooks: "A textbook page with structured educational content and explanations."
+          ICML Papers: "A research paper from ICML, covering machine learning topics."
+          NeurIPS Papers: "A research paper from NeurIPS on AI and ML topics."
+          Manuallib: "A product manual page with technical specifications and instructions."
+          InfoVQA: "An infographic with structured data, charts, and annotations."
+          PlotQA: "A numerical data visualization, such as bar charts or line graphs."
+          SlideVQA: "A presentation slide with text, bullet points, and diagrams."
+          ArxivQA: "A figure from a research paper, including plots or experimental results."
+          MP-DocVQA: "A page from a multi-page document with text or tables."
+          ChartQA: "A statistical chart comparing values or analyzing trends."
+        fallback: ""
+      visual_token_placement: own_line
+      trailing_newline: preserve
+    negative:
+      empty: empty_multimodal_input
+  weight: 12
+
+# ============================================================================
+# Video Datasets (type: llavahound_train)
+# ============================================================================
+# Note: LLaVA-Hound Lance dataset expects:
+#   - path: Root directory containing data/train_300k.lance (frames)
+#           and data/video_instruction/{subset}.lance (instructions)
+#   - subset: Relative path under video_instruction/ (e.g., "train/sft/video_caption_300k")
+#
+# - video_caption_300k:
+#   query = "<|video_pad|>\\n{question_or_prompt}\\n"
+#   positive = "{caption}\\n"
+#   negative = ""
+# - video_caption_300k-video:
+#   query = "Find a video that contains the following visual content: {caption}\\n"
+#   positive = "Understand the content of the provided video: <|video_pad|>\\n"
+#   negative = ""
+# - video_qa_240k:
+#   query = "<|video_pad|>\\nAnswer a question based on the content of a video.\\n{question}\\n"
+#   positive = "{answer}\\n"
+#   negative = ""
+
+video_caption_300k:
+  # final query: "<|video_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|video_pad|>\nWrite an in-depth depiction of the video, covering all its aspects.\n"
+  # example positive: "The video opens with a view of an indoor court marked with various lines, presumably for different sports. There are four red balls aligned on the center line. In subsequent frames, people enter the frame, and a dodgeball game commences. The players are seen throwing balls at one another, maneuvering around the court to avoid being hit, and attempting to catch the balls. The participants vary in their attire, indicating a casual and informal game setting. The color contrasts of the red balls and the colored lines on the floor are visually prominent throughout the video. As the game progresses, players are occasionally hit by a ball and step out of the main play area. There appears to be good-natured interaction between the players, supportive of a friendly game rather than a competitive match.\n"
+  # example negative: ""
+  # transform defaults supported by `llavahound_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.positive.instruction
+  type: llavahound_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/ShareGPTVideo_train_video_and_instruction
+  subset: train/sft/video_caption_300k
+  num_frames: 8
+  data_mode: caption_retrieval
+  transform:
+    query:
+      instruction: ""
+      instruction_body_separator: newline
+      trailing_newline: preserve
+    positive:
+      trailing_newline: preserve
+    negative:
+      empty: empty_multimodal_input
+  weight: 5
+
+video_caption_300k-video:
+  # final query: "{text}\\n"
+  # final positive: "{text} <|video_pad|>\\n"
+  # final negative: ""
+  # example query: "Find a video that contains the following visual content: The video opens with a view of an indoor court marked with various lines, presumably for different sports. There are four red balls aligned on the center line. In subsequent frames, people enter the frame, and a dodgeball game commences. The players are seen throwing balls at one another, maneuvering around the court to avoid being hit, and attempting to catch the balls. The participants vary in their attire, indicating a casual and informal game setting. The color contrasts of the red balls and the colored lines on the floor are visually prominent throughout the video. As the game progresses, players are occasionally hit by a ball and step out of the main play area. There appears to be good-natured interaction between the players, supportive of a friendly game rather than a competitive match.\n"
+  # example positive: "Understand the content of the provided video: <|video_pad|>\n"
+  # example negative: ""
+  # transform defaults supported by `llavahound_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.positive.instruction
+  type: llavahound_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/ShareGPTVideo_train_video_and_instruction
+  subset: train/sft/video_caption_300k
+  num_frames: 8
+  data_mode: video_retrieval
+  transform:
+    query:
+      instruction: "Find a video that contains the following visual content:"
+      instruction_body_separator: space
+      trailing_newline: preserve
+    positive:
+      instruction: "Understand the content of the provided video:"
+      visual_token_placement: inline_end
+      trailing_newline: preserve
+    negative:
+      empty: empty_multimodal_input
+  weight: 5
+
+video_qa_240k:
+  # final query: "<|video_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|video_pad|>\nAnswer a question based on the content of a video.\nWhat is the setting of the video?\n"
+  # example positive: "The setting of the video appears to be a newsroom with desks and computers in the background, suggesting an office environment with other personnel working.\n"
+  # example negative: ""
+  # transform defaults supported by `llavahound_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.positive.instruction
+  type: llavahound_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/ShareGPTVideo_train_video_and_instruction
+  subset: train/sft/video_240k_caption_15k
+  num_frames: 8
+  data_mode: caption_retrieval
+  transform:
+    query:
+      instruction: "Answer a question based on the content of a video."
+      instruction_body_separator: newline
+      trailing_newline: preserve
+    positive:
+      trailing_newline: preserve
+    negative:
+      empty: empty_multimodal_input
+  weight: 5

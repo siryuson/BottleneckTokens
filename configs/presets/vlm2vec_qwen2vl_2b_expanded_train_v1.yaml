@@ -1,0 +1,85 @@
+# ================================================================
+# VLM2Vec Preset - Qwen2-VL-2B Expanded Train V1
+# ================================================================
+# Based on the Qwen2-VL-2B VLM2Vec preset, but uses the expanded
+# training mixture in `configs/datasets/expanded_train_datasets_v1.yaml`.
+#
+# Usage
+#   python scripts/train.py configs/presets/vlm2vec_qwen2vl_2b_expanded_train_v1.yaml
+#   python scripts/train.py configs/presets/vlm2vec_qwen2vl_2b_expanded_train_v1.yaml \
+#       train.args.run_name=my_experiment
+#   python scripts/train.py configs/presets/vlm2vec_qwen2vl_2b_expanded_train_v1.yaml \
+#       output_base=/data/experiments train.args.run_name=my_experiment
+#
+# Dataset mixture
+#   - enabled entries: 62
+#   - total samples: 6,466,803
+#   - modality budget: image / video / visdoc is roughly 46.3 / 17.2 / 31.8
+#   - within each modality, weights follow samples^0.78, rounded to one decimal
+#   - expected `all_exhausted` epoch stays below 15M rows; GQA uses the balanced
+#     train split by default while keeping the 14.3M-row full split available
+#   - MMLongBench-doc is commented out because its leak-free split only has 4 rows
+#
+# Key training parameters
+#   - per_device_train_batch_size: 128
+#   - gc_chunk_size: 8
+#   - interleave_batch_size: inherited from `vlm2vec_base.yaml`
+#   - learning_rate: 5e-5
+#   - temperature: 0.02
+#   - max_steps: 5000, warmup_steps: 100
+#   - lora_r: 16
+# ================================================================
+
+# ==================== Output
+output_base: ./output
+
+# ==================== Model
+model:
+  _inherit_: ../models/vlm2vec_qwen2vl_2b.yaml
+
+# ==================== PEFT Configuration
+peft:
+  _inherit_: ../peft/lora_default.yaml
+
+processor:
+  type: qwen2_vl
+  processor_name: Qwen/Qwen2-VL-2B-Instruct
+  image_min_pixels: 3136       # 28*28*4
+  image_max_pixels: 1003520    # 28*28*1280
+  video_min_pixels: 3136       # 28*28*4
+  video_max_pixels: 301056     # 28*28*384
+
+eval:
+  type: mmeb
+  data_path: ${oc.env:VLM2EMB_MMEB_V2_ROOT,./data/MMEB-V2}
+  batch_size: 8
+  # MMEB eval repeatedly rebuilds short-lived query/candidate DataLoaders.
+  # With Lance multiprocess loading this path must stay on spawn, so higher
+  # worker counts mostly amplify per-subset cold-start latency.
+  num_workers: 0
+
+# ==================== Training
+train:
+  dataset:
+    type: combined
+    datasets:
+      _inherit_: ../datasets/expanded_train_datasets_v1.yaml
+
+  collator:
+    type: training
+
+  trainer:
+    type: vlm2vec_trainer
+
+  args:
+    _inherit_: ../training/vlm2vec_base.yaml
+    output_dir: ${output_base}/${train.args.run_name}
+    run_name: vlm2vec_qwen2vl_2b_expanded_train_v1
+    per_device_train_batch_size: 128
+    gc_chunk_size: 4
+    eval_strategy: steps
+    eval_steps: 500
+    metric_for_best_model: eval_overall
+    greater_is_better: true
+    ddp_find_unused_parameters: true
+    dataloader_drop_last: true

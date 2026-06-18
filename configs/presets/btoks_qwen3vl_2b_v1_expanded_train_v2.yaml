@@ -1,0 +1,86 @@
+# ================================================================
+# BToks Preset - Qwen3-VL-2B V1 Expanded Train V2
+# ================================================================
+# Uses the BToks v1 architecture with Qwen3-VL-2B and the dataset v2
+# expanded mixture in `configs/datasets/btoks_expanded_train_datasets_v2.yaml`.
+#
+# Usage
+#   python scripts/train.py configs/presets/btoks_qwen3vl_2b_v1_expanded_train_v2.yaml
+#   python scripts/train.py configs/presets/btoks_qwen3vl_2b_v1_expanded_train_v2.yaml \
+#       train.args.run_name=my_experiment
+#   python scripts/train.py configs/presets/btoks_qwen3vl_2b_v1_expanded_train_v2.yaml \
+#       output_base=/data/experiments train.args.run_name=my_experiment
+#
+# Dataset mixture
+#   - inherits the full v1 expanded training entries and weights
+#   - appends v2 enabled entries: VizWiz, RefCOCO, RefCOCO-Matching,
+#     VATEX, K700, and VideoChat2-IT
+#   - uses the BToks dataset layer so every entry has metadata.ntp_side
+#   - keeps video_max_pixels conservative for the extra generation branch
+#
+# Key training parameters
+#   - per_device_train_batch_size: 128
+#   - gc_chunk_size: 4
+#   - interleave_batch_size: 512
+#   - learning_rate: 5e-5
+#   - temperature: 0.02
+#   - max_steps: 5000, warmup_steps: 100
+#   - generation_loss_duration: 5000
+# ================================================================
+
+# ==================== Output
+output_base: ./output
+
+processor:
+  type: qwen3_vl
+  processor_name: Qwen/Qwen3-VL-2B-Instruct
+  # Keep the boundary-wrapped visual token form as the production default.
+  # Flip this only for tightly scoped regression experiments when comparing
+  # processor behavior against historical checkpoints or archived eval runs.
+  wrap_visual_tokens_with_boundaries: true
+  image_min_pixels: 3136       # 28*28*4
+  image_max_pixels: 1003520    # 28*28*1280
+  video_min_pixels: 3136       # 28*28*4
+  video_max_pixels: 301056     # 28*28*384
+
+model:
+  _inherit_: ../models/btoks_qwen3vl_2b_v1.yaml
+
+peft:
+  _inherit_: ../peft/lora_default.yaml
+
+eval:
+  type: mmeb
+  data_path: ${oc.env:VLM2EMB_MMEB_V2_ROOT,./data/MMEB-V2}
+  batch_size: 8
+  # MMEB eval repeatedly rebuilds short-lived query/candidate DataLoaders.
+  # With Lance multiprocess loading this path must stay on spawn, so higher
+  # worker counts mostly amplify per-subset cold-start latency.
+  num_workers: 0
+
+train:
+  dataset:
+    type: combined
+    datasets:
+      _inherit_: ../datasets/btoks_expanded_train_datasets_v2.yaml
+
+  collator:
+    type: training
+
+  trainer:
+    type: btoks_trainer
+
+  args:
+    _inherit_: ../training/btoks_base.yaml
+    output_dir: ${output_base}/${train.args.run_name}
+    run_name: btoks_qwen3vl_2b_v1_expanded_train_v2
+    per_device_train_batch_size: 128
+    gc_chunk_size: 4
+    eval_strategy: steps
+    eval_steps: 500
+    generation_loss_duration: 5000
+    metric_for_best_model: eval_overall
+    interleave_batch_size: 512
+    greater_is_better: true
+    ddp_find_unused_parameters: true
+    dataloader_drop_last: true

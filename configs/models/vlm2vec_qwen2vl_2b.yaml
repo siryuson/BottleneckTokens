@@ -1,0 +1,21 @@
+# VLM2Vec Model Configuration - Qwen2-VL-2B
+#
+# Pipeline: Backbone -> LastTokenPooling -> Normalize
+#
+# Note: PEFT/LoRA configuration should be in training config, not here.
+
+type: VLM2Emb
+
+modules:
+  backbone:
+    type: Qwen2VLBackbone
+    model_name_or_path: Qwen/Qwen2-VL-2B-Instruct
+    dtype: bfloat16
+    attn_implementation: flash_attention_2
+    trust_remote_code: true
+
+  pooling:
+    type: LastTokenPooling
+
+  normalize:
+    type: Normalize

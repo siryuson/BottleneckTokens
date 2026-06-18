@@ -1,0 +1,32 @@
+{
+  "include": [
+    "src",
+    "tests",
+    "scripts"
+  ],
+  "exclude": [
+    "archive",
+    "docs",
+    "examples",
+    "openspec",
+    "**/__pycache__",
+    ".git",
+    ".ruff_cache",
+    ".pytest_cache",
+    ".venv",
+    "build",
+    "dist"
+  ],
+  "extraPaths": [
+    "src",
+    "/usr/local/lib/python3.11/dist-packages",
+    "/usr/lib/python3/dist-packages",
+    "/usr/lib/python3.11/dist-packages"
+  ],
+  "pythonVersion": "3.11",
+  "pythonPlatform": "Linux",
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true,
+  "reportMissingImports": "none",
+  "reportMissingTypeStubs": "none"
+}

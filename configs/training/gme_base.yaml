@@ -1,0 +1,19 @@
+# ================================================================
+# GME-style Training Arguments Baseline
+# ================================================================
+# Shared training arguments for fair GME-style dense baselines.
+#
+# The fair baseline does not perform hard-negative mining or consume private
+# GME data. It reuses the existing dense GradCache in-batch contrastive path.
+# ================================================================
+
+_inherit_: ./vlm2vec_base.yaml
+
+type: gme
+
+# GME public recipe commonly uses 0.03.
+temperature: 0.03
+
+# Reserved future switches. Keep false for fair core comparisons.
+use_explicit_negatives: false
+hard_negative_mining: false

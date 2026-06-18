@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+.coverage
+htmlcov/
+dist/
+build/
+site/
+
+# Environments and local config
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/
+.codex/
+AGENTS.md
+openspec/
+
+# Experiment artifacts
+logs/
+runs/
+outputs/
+checkpoints/
+wandb/
+*.ckpt
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# Local data
+/data/
+/datasets/
+/tmp/
+*.lance/
+*.lance

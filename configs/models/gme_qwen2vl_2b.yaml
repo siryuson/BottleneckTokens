@@ -1,0 +1,9 @@
+# GME-style Model Configuration - Qwen2-VL-2B
+#
+# Pipeline: Backbone -> LastTokenPooling -> Normalize
+#
+# This is intentionally the same dense single-vector architecture as VLM2Vec.
+# The GME-style baseline differs through query/corpus instruction policy and
+# training defaults, not through a new model output protocol.
+
+_inherit_: ./vlm2vec_qwen2vl_2b.yaml

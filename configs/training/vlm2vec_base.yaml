@@ -1,0 +1,66 @@
+# ================================================================
+# VLM2Vec Training Arguments Baseline
+# ================================================================
+# Shared training arguments for VLM2Vec presets.
+#
+# Usage in preset
+#   output_base: ./output    # top-level, used by output_dir interpolation
+#   train:
+#     args:
+#       _inherit_: ../training/vlm2vec_base.yaml
+#       output_dir: ${output_base}/${train.args.run_name}
+#       run_name: my_experiment
+# ================================================================
+
+type: vlm2vec
+
+# GradCache
+use_grad_cache: true
+gc_chunk_size: 4
+
+# Contrastive Loss
+temperature: 0.02
+
+# Batch Size
+per_device_train_batch_size: 128
+interleave_batch_size: 512
+interleave_stopping_strategy: all_exhausted
+remove_unused_columns: false
+
+# Learning Rate
+learning_rate: 5.0e-5
+lr_scheduler_type: linear
+weight_decay: 0.01
+
+# Training Duration
+max_steps: 5000
+warmup_steps: 100
+
+# Logging
+logging_steps: 1
+logging_first_step: true
+report_to: "none"
+
+# Checkpointing
+save_strategy: steps
+save_steps: 50
+save_safetensors: true
+
+# Precision
+bf16: true
+
+# Optimization
+optim: adamw_torch
+max_grad_norm: 1.0
+
+# DataLoader
+dataloader_num_workers: 4
+dataloader_pin_memory: true
+dataloader_persistent_workers: true
+dataloader_prefetch_factor: 2
+
+# Reproducibility
+seed: 42
+
+# Evaluation
+do_eval: true

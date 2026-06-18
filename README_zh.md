@@ -1,33 +1,32 @@
 # Bottleneck Tokens for Unified Multimodal Retrieval
 
-This repository contains the open-source reproduction code for
-**Bottleneck Tokens for Unified Multimodal Retrieval** (`BToks`),
-corresponding to [arXiv:2604.11095](https://arxiv.org/abs/2604.11095).
+本仓库用于开源复现论文
+**Bottleneck Tokens for Unified Multimodal Retrieval**（`BToks`），对应
+[arXiv:2604.11095](https://arxiv.org/abs/2604.11095)。
 
-The Python import namespace is `vlm2emb` for compatibility with the current
-runnable engineering code. The public method name, configuration surface, and
-documentation use `BToks`.
+Python import namespace 保留为 `vlm2emb`，用于兼容当前可运行工程；公开方法名、
+配置名和文档主线统一使用 `BToks`。
 
-Chinese documentation is available in [README_zh.md](README_zh.md).
+英文主文档见 [README.md](README.md)。
 
-## Scope
+## 范围
 
-Included:
+包含：
 
-- BToks token injection, pooling, and bottleneck-cache generation utilities.
-- Generative Information Condensation training loss and Condensation Mask path.
-- VLM2Vec, GME-style, and BToks training presets.
-- Lance-format training and MMEB-V2 evaluation data loaders.
-- Training, evaluation, data conversion, and release-check scripts.
-- Focused tests for configuration, BToks modules, training helpers, and eval code.
+- BToks token 注入、池化和 bottleneck-cache generation 工具。
+- Generative Information Condensation 训练损失和 Condensation Mask 路径。
+- VLM2Vec、GME-style 和 BToks 训练预设。
+- Lance 格式训练数据和 MMEB-V2 评测数据加载。
+- 训练、评测、数据转换和公开性检查脚本。
+- 配置、BToks 模块、训练辅助逻辑和评测入口的重点测试。
 
-Not included:
+不包含：
 
-- Checkpoints. Model checkpoint release is handled separately from this code release.
-- Private logs, local caches, internal cluster launchers, or internal dataset paths.
-- Local planning artifacts or workspace-only agent instructions.
+- checkpoint。checkpoint 发布与本次代码开源分开处理。
+- 私有日志、本地缓存、内部集群 launcher 或内部数据路径。
+- 本地规划产物或仅供 workspace 使用的 agent 指令文件。
 
-## Installation
+## 安装
 
 ```bash
 python -m venv .venv
@@ -37,25 +36,23 @@ python -m pip install -e ".[dev]"
 python -m pip install -r requirements.txt
 ```
 
-For distributed GPU training, install the FlashAttention and DeepSpeed builds
-that match your CUDA/PyTorch environment, for example:
+分布式 GPU 训练时，请按本机 CUDA/PyTorch 环境安装匹配的 FlashAttention 和
+DeepSpeed，例如：
 
 ```bash
 python -m pip install -e ".[gpu]"
 ```
 
-## Data
+## 数据
 
-The runtime uses Lance tables. Public configs resolve data from local paths:
+运行时使用 Lance 表。公开配置默认读取本地路径：
 
-- `VLM2EMB_MMEB_TRAIN_ROOT`, default `./data/MMEB-train`
-- `VLM2EMB_MMEB_V2_ROOT`, default `./data/MMEB-V2`
-- `VLM2EMB_DATA_ROOT`, default `./data`, for additional training roots used by
-  the base and expanded presets.
+- `VLM2EMB_MMEB_TRAIN_ROOT`，默认 `./data/MMEB-train`
+- `VLM2EMB_MMEB_V2_ROOT`，默认 `./data/MMEB-V2`
+- `VLM2EMB_DATA_ROOT`，默认 `./data`，用于 base 和 expanded preset 里的其它训练根目录。
 
-Download the data needed by the default README training and evaluation commands.
-These repository IDs are the current public hosting locations for the prepared
-Lance datasets; they are not an author or organization identity for the paper.
+默认 README 训练和评测命令需要先下载。下面的仓库 ID 是当前已准备好的
+Lance 数据公开托管地址，不代表论文作者或组织的唯一身份。
 
 ```bash
 export BTOKS_MMEB_TRAIN_HF_REPO=siyrus/BToks-MMEB-train
@@ -71,7 +68,7 @@ python scripts/download_lance_data.py "$BTOKS_VISRAG_HF_REPO" --local-dir data/o
 python scripts/download_lance_data.py "$BTOKS_LLAVAHOUND_HF_REPO" --local-dir data/ShareGPTVideo_train_video_and_instruction
 ```
 
-You can also set the paths explicitly:
+也可以显式指定本地路径：
 
 ```bash
 export VLM2EMB_MMEB_TRAIN_ROOT=/path/to/MMEB-train
@@ -79,13 +76,12 @@ export VLM2EMB_MMEB_V2_ROOT=/path/to/MMEB-V2
 export VLM2EMB_DATA_ROOT=/path/to/additional-training-roots
 ```
 
-Expanded training presets use additional public dataset roots under
-`VLM2EMB_DATA_ROOT`; keep each local directory name equal to the suffix after
-`BToks-` in the corresponding Hugging Face dataset repo.
+expanded training preset 会使用 `VLM2EMB_DATA_ROOT` 下更多公开数据根目录；
+每个本地目录名应和对应 Hugging Face dataset repo 中 `BToks-` 后面的后缀一致。
 
-## Training
+## 训练
 
-BToks Qwen2-VL-2B:
+BToks Qwen2-VL-2B：
 
 ```bash
 PYTHONPATH=src python scripts/train.py configs/presets/btoks_qwen2vl_2b_v1.yaml \
@@ -93,7 +89,7 @@ PYTHONPATH=src python scripts/train.py configs/presets/btoks_qwen2vl_2b_v1.yaml 
   train.args.report_to=none
 ```
 
-VLM2Vec baseline:
+VLM2Vec baseline：
 
 ```bash
 PYTHONPATH=src python scripts/train.py configs/presets/vlm2vec_qwen2vl_2b.yaml \
@@ -101,7 +97,7 @@ PYTHONPATH=src python scripts/train.py configs/presets/vlm2vec_qwen2vl_2b.yaml \
   train.args.report_to=none
 ```
 
-GME-style baseline:
+GME-style baseline：
 
 ```bash
 PYTHONPATH=src python scripts/train.py configs/presets/gme_qwen2vl_2b.yaml \
@@ -109,10 +105,9 @@ PYTHONPATH=src python scripts/train.py configs/presets/gme_qwen2vl_2b.yaml \
   train.args.report_to=none
 ```
 
-## Evaluation
+## 评测
 
-No checkpoint is published as part of this first code release. After preparing
-your own local checkpoint, run evaluation with:
+本次首个代码发布不包含 checkpoint。准备好你自己的本地 checkpoint 后，可以运行：
 
 ```bash
 PYTHONPATH=src python scripts/eval.py configs/presets/btoks_qwen2vl_2b_v1.yaml \
@@ -120,7 +115,7 @@ PYTHONPATH=src python scripts/eval.py configs/presets/btoks_qwen2vl_2b_v1.yaml \
   --output-dir ./eval/btoks_qwen2vl_2b_v1
 ```
 
-## Verification
+## 验证
 
 ```bash
 PYTHONPATH=src python -c "from vlm2emb import BToksConfig; print(BToksConfig.model_type)"
@@ -131,5 +126,5 @@ PYTHONPATH=src python scripts/check_public_release.py
 PYTHONPATH=src pytest tests/test_btoks_ablation.py tests/test_btoks_trainer.py tests/evaluate/test_eval_script.py
 ```
 
-Before creating a public release commit, also check `git status --short` and
-make sure local-only planning, cache, and agent-control files are not included.
+创建公开首个完整代码 commit 前，还需要检查 `git status --short`，确保
+本地规划、缓存和 agent-control 文件不会进入公开提交。

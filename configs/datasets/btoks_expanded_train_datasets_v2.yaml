@@ -1,0 +1,163 @@
+# BToks expanded dataset v2 full training layer
+#
+# Inherit the first-round BToks dataset layer and append the second-round
+# enabled datasets with BToks generation target-side metadata.
+#
+# `K700` now uses the promoted production frame-unit root.
+
+_inherit_: ./btoks_expanded_train_datasets_v1.yaml
+
+VizWiz:
+  # Source: official VizWiz VQA train / val / test annotations and train / val image zips.
+  # Runtime: image-question-to-answer, answerable rows only.
+  type: vizwiz_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/VizWiz
+  dataset_name: VizWiz
+  split: official_train_answerable_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Represent the given image with the following question:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 14012
+  # exclusions: mmeb_v2_eval=979, unanswerable_or_no_selected_answer=5532
+  weight: 0.3
+  metadata:
+    ntp_side: positive
+
+RefCOCO:
+  # Source: local HF `jxu124/refcoco` metadata plus local RefCOCO media tar.
+  # Runtime: full image + referring expression query, positive crop image target.
+  type: refcoco_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/RefCOCO
+  dataset_name: RefCOCO
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Select the portion of the image that follows the language expressions:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+      caption_selection: first
+    positive:
+      instruction: "Represent the given cropped image of the object."
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 38181
+  # exclusions: mmeb_v2_eval=4223
+  weight: 0.3
+  metadata:
+    ntp_side: none
+
+RefCOCO-Matching:
+  # Source: same admitted RefCOCO root; matching view keeps expressions on both sides.
+  # Runtime: full image + referring expression query, positive crop image with the same expression prompt.
+  type: refcoco_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/RefCOCO
+  dataset_name: RefCOCO-Matching
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Select the portion of the image that follows the language expressions:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+      caption_selection: first
+    positive:
+      instruction: "Select the portion of the image that follows the language expressions:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+      caption_selection: first
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 38181
+  # exclusions: mmeb_v2_eval=4223
+  weight: 0.3
+  metadata:
+    ntp_side: none
+
+VATEX:
+  # Source: official VATEX training JSON plus the matching local video archive.
+  # Runtime: text-to-video retrieval over pre-extracted full-video frame units.
+  type: vatex_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/VATEX
+  dataset_name: VATEX
+  split: official_train_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Find a video that matches the following caption:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+      caption_selection: random
+      caption_field: en_caption
+    positive:
+      instruction: "Understand the content of the provided video."
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+  # samples: 22105
+  # exclusions: bad_media=3886, mmeb_v2_eval_overlap=0
+  weight: 0.3
+  metadata:
+    ntp_side: query
+
+K700:
+  # Source: official Kinetics-700-2020 train annotations and local train tar mirror.
+  # Runtime: video classification over pre-extracted full-video frame units.
+  type: kinetics700_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/Kinetics-700
+  dataset_name: Kinetics-700
+  split: train_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Recognize the category of the video content."
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 536489
+  # exclusions: invalid_videos=10, mmeb_v2_eval_overlap=0
+  weight: 5.9
+  metadata:
+    ntp_side: positive
+
+VideoChat2-IT:
+  # Source: byminji/VideoChat2-IT-clean annotations over media-backed local roots.
+  # Runtime: split video instruction QA; unsupported or missing-media rows are excluded.
+  # Enabled subsets:
+  #   next_qa=34132, youcook2=4901, ssv2=40000, k710=29844, videochatgpt=86707 QA turns.
+  type: videochat2_it_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/VideoChat2-IT
+  dataset_name: VideoChat2-IT
+  split: official_train_without_mmeb_v2_eval
+  num_frames: 8
+  frame_roots:
+    nextqa: ${oc.env:VLM2EMB_DATA_ROOT,./data}/NExTQA/data/frames.lance
+    youcook2: ${oc.env:VLM2EMB_DATA_ROOT,./data}/YouCook2/data/frames.lance
+    ssv2: ${oc.env:VLM2EMB_DATA_ROOT,./data}/SmthSmthV2/data/frames.lance
+    kinetics700: ${oc.env:VLM2EMB_DATA_ROOT,./data}/Kinetics-700/data/frames.lance
+    activitynet_full: ${oc.env:VLM2EMB_DATA_ROOT,./data}/VideoChat2-IT/data/activitynet_full_frames.lance
+  transform:
+    query:
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+  # samples: 195584
+  # exclusions: missing_media=12932 source rows, unsupported_subsets remain audit-only
+  weight: 2.0
+  metadata:
+    ntp_side: positive

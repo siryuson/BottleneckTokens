@@ -1,0 +1,9 @@
+# MMEB Benchmark Evaluation Fragment
+#
+# Usage
+#   eval:
+#     _inherit_: ../eval/mmeb.yaml
+
+type: mmeb
+data_path: ${oc.env:VLM2EMB_MMEB_V2_ROOT,./data/MMEB-V2}
+batch_size: 4

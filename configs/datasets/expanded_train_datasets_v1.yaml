@@ -1,0 +1,1715 @@
+# ============================================================================
+# Expanded Public Training Dataset Template
+# ============================================================================
+#
+# - This file is the public expanded training mixture used by VLM2Vec presets.
+# - Each enabled top-level entry is a registry-buildable dataset config.
+# - `type` selects the dataset loader, and `path` resolves against
+#   `VLM2EMB_DATA_ROOT` unless an entry has its own public root variable.
+# - `weight` uses a conservative temperature mix: image / video / visdoc is
+#   roughly 46.3 / 17.2 / 31.8 after moving K700 to the v2 expansion
+#   workstream. Entries inside each modality use samples^0.78, rounded to one
+#   decimal. With
+#   `all_exhausted`, this keeps the expected epoch below 15M rows. GQA
+#   uses its balanced split by default; the 14.3M-row train_all split remains
+#   available as an explicit full-source view.
+# - `subset` keeps the storage split explicit so dataset provenance can be
+#   audited without executing the loader.
+# - `# samples:` records the count for the selected split after MMEB-V2
+#   evaluation-leak filtering and runtime transform policy.
+#
+# - enabled entries: 62
+# - total samples: 6,466,803
+# - MMEB train subsets: 1,068,469
+# - ViDoRe full/source views: 236,390
+# - VisRAG source views: 122,752
+# - LLaVA-Hound views: 858,502
+# - expanded standalone datasets: 4,180,690
+#
+# - MMEB train subsets -> `mmeb_train`
+# - ViDoRe full/source views -> `vidore_train` / `vidore_rag_train`
+# - VisRAG single subsets -> `visrag_train`
+# - LLaVA-Hound caption / video retrieval / QA -> `llavahound_train`
+# - SmthSmthV2 video classification -> `ssv2_train`
+#
+
+# ============================================================================
+# MMEB image/document retrieval train subsets
+# ============================================================================
+
+ImageNet_1K:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nRepresent the given image for classification\n"
+  # example positive: "plane, carpenter's plane, woodworking plane"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: ImageNet_1K
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 100000
+  weight: 1.3
+
+N24News:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: "{text}"
+  # example query: "<|image_pad|>\nRepresent the given news image with the following caption for domain classification: Danai Gurira and André Holland in a theater at New York University, where they met in the Tisch Graduate Acting Program.\n"
+  # example positive: "Theater"
+  # example negative: "Global Business"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: N24News
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  # samples: 48988
+  weight: 0.7
+
+HatefulMemes:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: "{text}"
+  # example query: "<|image_pad|>\nRepresent the given image for binary classification to determine whether it constitutes hateful speech or not\n"
+  # example positive: "Yes"
+  # example negative: "No"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: HatefulMemes
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  # samples: 8500
+  weight: 0.2
+
+VOC2007:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nIdentify the object shown in the image\n"
+  # example positive: "car"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: VOC2007
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 7844
+  weight: 0.2
+
+SUN397:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nIdentify the scene shown in the image\n"
+  # example positive: "abbey"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: SUN397
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 19850
+  weight: 0.4
+
+OK-VQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: "{text}"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: What is the hairstyle of the blond called?\n"
+  # example positive: "pony tail"
+  # example negative: "husky"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: OK-VQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  # samples: 9007
+  weight: 0.2
+
+A-OKVQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: "{text}"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: What is the man by the bags awaiting?\n"
+  # example positive: "cab"
+  # example negative: "train"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: A-OKVQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  # samples: 17055
+  weight: 0.3
+
+DocVQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: "{text}"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: what is the date mentioned in this letter?\n"
+  # example positive: "1/8/93"
+  # example negative: "398,627.92"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: DocVQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  # samples: 39463
+  weight: 3.4
+
+InfographicsVQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: "{text}"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: Which type of fonts offer better readability in printed works?\n"
+  # example positive: "serif fonts"
+  # example negative: "his, he, hers"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: InfographicsVQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  # samples: 23946
+  weight: 2.3
+
+ChartQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: "{text}"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: Is the value of Favorable 38 in 2015?\n"
+  # example positive: "Yes"
+  # example negative: "No"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: ChartQA
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      whitespace_normalization: strip_trailing_horizontal
+    negative:
+      whitespace_normalization: strip_trailing_horizontal
+  # samples: 28299
+  weight: 2.6
+
+Visual7W:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: "{text}"
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: What is written on the white square on the bus?\n"
+  # example positive: "Fox's Ginger Biscuits."
+  # example negative: "Mac's Macaroni Hut."
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: Visual7W
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  # samples: 69817
+  weight: 1
+
+VisDial:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: "<|image_pad|>\n"
+  # example query: "Represent the given dialogue about an image, which is used for image retrieval: Q:is this a child or adult\nA:adult\nQ:male or female\nA:male\nQ:are they inside or outside\nA:inside\nQ:are they laying on the floor\nA:yes, but there is a blanket in between them and the floor\nQ:is the floor carpeted or wooden\nA:it is tile\nQ:what color is the blanket\nA:red and white\nQ:what color is the tile\nA:orange red\nQ:what breed is the dog\nA:boxer\nQ:does the dog look healthy and happy\nA:yes\nQ:what color is the dog\nA:tan\n"
+  # example positive: "<|image_pad|>\nRepresent the given image\n"
+  # example negative: "<|image_pad|>\n"
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: VisDial
+  transform:
+    query:
+      instruction_body_separator: newline
+      trailing_newline: normalize_blank_tail
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      visual_token_alignment: restore_if_empty
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+  # samples: 123287
+  weight: 1.5
+
+CIRR:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nGiven an image, find a similar everyday image with the described changes: Many hamster together playing in a different background.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: CIRR
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 26116
+  weight: 0.4
+
+VisualNews_t2i:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Retrieve an image of this news caption. Turkish President Tayyip Erdogan looks on after arriving at Esenboga Airport in Ankara Turkey June 8 2015 Turkey faced the prospect of weeks of political turmoil after the ruling AK Party lost its parliamentary majority REUTERSUmit Bektas.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: VisualNews_t2i
+  transform:
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 99903
+  weight: 1.3
+
+VisualNews_i2t:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nFind a caption for the news in the given photo.\n"
+  # example positive: "Turkish President Tayyip Erdogan looks on after arriving at Esenboga Airport in Ankara Turkey June 8 2015 Turkey faced the prospect of weeks of political turmoil after the ruling AK Party lost its parliamentary majority REUTERSUmit Bektas."
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: VisualNews_i2t
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 100000
+  weight: 1.3
+
+MSCOCO_t2i:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find me an everyday image that matches the given caption: A teddy bear shop is equipped with a door guard teddy and a neighbor teddy above.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: MSCOCO_t2i
+  transform:
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 100000
+  weight: 1.3
+
+MSCOCO_i2t:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nFind an image caption describing the given everyday image.\n"
+  # example positive: "A skateboarder in mid air following a jump form cincrete."
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: MSCOCO_i2t
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 113287
+  weight: 1.4
+
+NIGHTS:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nFind a day-to-day image that looks similar to the provided image.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: NIGHTS
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 15941
+  weight: 0.3
+
+WebQA:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find a Wikipedia image that answers this question: Which body part is found on both a 1913 D Barber half and a 1914 Barber Quarter?\n"
+  # example positive: "<|image_pad|>\nRepresent the given Wikipedia image with related text information: 1913-D Barber half obverse.\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: WebQA
+  transform:
+    query:
+      visual_token_alignment: strip_without_media
+      trailing_newline: ensure_single
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 17166
+  weight: 0.3
+
+MSCOCO:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nSelect the portion of the image that isolates the object labeled as \"hot dog\"\n"
+  # example positive: "<|image_pad|>\nRepresent the given cropped image of the object\n"
+  # example negative: ""
+  type: mmeb_train
+  path: ${oc.env:VLM2EMB_MMEB_TRAIN_ROOT,./data/MMEB-train}
+  subset: MSCOCO
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 100000
+  weight: 1.3
+
+# ============================================================================
+# ViDoRe / VisRAG
+# ============================================================================
+
+colpali_train_set:
+  # Full QA view over the same upstream source as the RAG source views below.
+  # Raw schema: image / image_filename / query / answer / options / source /
+  # page / model / prompt / answer_type.
+  # Runtime view (`vidore_train`, archive parser = vidore_fixoptions_v2):
+  #   query uses the document page image plus question/options;
+  #   positive resolves the answer letter to the answer text when options exist.
+  # final query: "<|image_pad|>\\n{query} Options: {options}"
+  # final positive: "{resolved_answer}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nComparing panels a, b, c, and d, which statement best describes the data variance? Options: ['A. The variance of the data decreases from panel a to panel d.', 'B. The variance of the data increases from panel a to panel d.', 'C. The data presents no variance in any of the panels.', 'D. The variance of the data is inconsistent across the panels.', '-']"
+  # example positive: "The variance of the data is inconsistent across the panels."
+  # example negative: ""
+  type: vidore_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/vidore_colpali_train_set
+  transform:
+    query:
+      visual_token_placement: own_line
+      trailing_newline: preserve
+    positive:
+      trailing_newline: preserve
+    negative:
+      empty: empty_multimodal_input
+  # samples: 118195
+  weight: 1
+
+colpali_train_set_arxiv_qa:
+  # RAG retrieval view derived from the same upstream source as the full QA
+  # view above. It discards answer supervision and trains text-query to
+  # document-page retrieval.
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find a document image that matches the given query: Comparing panels a, b, c, and d, which statement best describes the data variance?\n"
+  # example positive: "<|image_pad|>\nUnderstand the content of the provided document image.\n"
+  # example negative: ""
+  # transform defaults supported by `vidore_rag_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instruction
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: vidore_rag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/vidore_rag_arxiv_qa
+  transform: &vidore_rag_train_transform_defaults
+    query:
+      instruction: "Find a document image that matches the given query:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Understand the content of the provided document image."
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 9949
+  weight: 1.2
+
+colpali_train_set_pdf:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find a document image that matches the given query: What is the duration of the course mentioned in the image?\n"
+  # example positive: "<|image_pad|>\nUnderstand the content of the provided document image.\n"
+  # example negative: ""
+  # transform defaults supported by `vidore_rag_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instruction
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: vidore_rag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/vidore_rag_pdf
+  transform: *vidore_rag_train_transform_defaults
+  # samples: 45718
+  weight: 3.8
+
+colpali_train_set_docvqa:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find a document image that matches the given query: What is the date?\nYour answer should be very brief.\n"
+  # example positive: "<|image_pad|>\nUnderstand the content of the provided document image.\n"
+  # example negative: ""
+  # transform defaults supported by `vidore_rag_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instruction
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: vidore_rag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/vidore_rag_docvqa
+  transform: *vidore_rag_train_transform_defaults
+  # samples: 39302
+  weight: 3.4
+
+colpali_train_set_tatdqa:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find a document image that matches the given query: What was the increase in income before income taxes in Semiconductor Test driven by?\n"
+  # example positive: "<|image_pad|>\nUnderstand the content of the provided document image.\n"
+  # example negative: ""
+  # transform defaults supported by `vidore_rag_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instruction
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: vidore_rag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/vidore_rag_tatdqa
+  transform: *vidore_rag_train_transform_defaults
+  # samples: 13188
+  weight: 1.4
+
+colpali_train_set_Infographic-VQA:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find a document image that matches the given query: How many tips are mentioned for prevention of coronavirus?\nAnswer briefly.\n"
+  # example positive: "<|image_pad|>\nUnderstand the content of the provided document image.\n"
+  # example negative: ""
+  # transform defaults supported by `vidore_rag_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instruction
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: vidore_rag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/vidore_rag_Infographic-VQA
+  transform: *vidore_rag_train_transform_defaults
+  # samples: 10038
+  weight: 1.2
+
+visrag-indomain_InfoVQA:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "This query is related to retrieving an infographic that visually presents statistical or factual information using charts, icons, and structured layouts. The retrieved image should contain the necessary visual elements to provide the best context for answering the query: which are the countries with Chinese speaking population other than China according to this infographic?\n"
+  # example positive: "<|image_pad|>\nAn infographic with structured data, charts, and annotations.\n"
+  # example negative: ""
+  # transform defaults supported by `visrag_train`:
+  #   transform.query.instructions.by_source
+  #   transform.query.instructions.fallback
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instructions.by_source
+  #   transform.positive.instructions.fallback
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: visrag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/visrag_indomain_InfoVQA
+  transform: &visrag_train_transform_defaults
+    query:
+      instructions:
+        by_source:
+          NeurIPS Papers: "This query is about a research paper from NeurIPS, a leading AI/ML conference. The document contains technical discussions, methodologies, and findings. Identify relevant papers and sections that address the query:"
+          Textbooks: "This query is related to a college-level textbook, which provides structured explanations, definitions, and examples. Find the most relevant concepts or explanations that address the query:"
+          ICML Papers: "This query is about a research paper from ICML, a leading AI/ML conference. The document contains theoretical insights, experiments, and applications. Identify relevant papers and sections that best answer the query:"
+          Manuallib: "This query pertains to a product manual, which contains detailed technical specifications, usage instructions, and troubleshooting steps. Find the most relevant section that answers the query:"
+          ArxivQA: "This query is related to retrieving a relevant figure from an ArXiv research paper. The retrieved figure should contain scientific plots, mathematical visualizations, or experimental results that best address the query:"
+          ChartQA: "This query is related to retrieving a relevant chart that visually represents numerical or categorical data. The retrieved chart should contain bar graphs, line charts, or other visual elements necessary to analyze trends, compare values, or extract insights related to the query:"
+          MP-DocVQA: "This query is related to retrieving a relevant page from a multi-page document, such as reports, invoices, or research papers. The retrieved document should contain text, tables, or structured information necessary to answer the query:"
+          InfoVQA: "This query is related to retrieving an infographic that visually presents statistical or factual information using charts, icons, and structured layouts. The retrieved image should contain the necessary visual elements to provide the best context for answering the query:"
+          PlotQA: "This query relates to retrieving a relevant plot or chart that visually represents numerical data. The retrieved figure should contain the necessary information to analyze trends, compare values, or extract key insights related to the query:"
+          SlideVQA: "This query is related to retrieving a relevant presentation slide that visually presents structured information. The retrieved slide should contain the necessary text, charts, or graphics to provide the best answer to the query:"
+        fallback: ""
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+    positive:
+      instructions:
+        by_source:
+          Textbooks: "A textbook page with structured educational content and explanations."
+          ICML Papers: "A research paper from ICML, covering machine learning topics."
+          NeurIPS Papers: "A research paper from NeurIPS on AI and ML topics."
+          Manuallib: "A product manual page with technical specifications and instructions."
+          InfoVQA: "An infographic with structured data, charts, and annotations."
+          PlotQA: "A numerical data visualization, such as bar charts or line graphs."
+          SlideVQA: "A presentation slide with text, bullet points, and diagrams."
+          ArxivQA: "A figure from a research paper, including plots or experimental results."
+          MP-DocVQA: "A page from a multi-page document with text or tables."
+          ChartQA: "A statistical chart comparing values or analyzing trends."
+        fallback: ""
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 17664
+  weight: 1.8
+
+visrag-indomain_ArxivQA:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "This query is related to retrieving a relevant figure from an ArXiv research paper. The retrieved figure should contain scientific plots, mathematical visualizations, or experimental results that best address the query: In subfigure (b), which relationship does the blue dotted line indicate?\n"
+  # example positive: "<|image_pad|>\nA figure from a research paper, including plots or experimental results.\n"
+  # example negative: ""
+  # transform defaults supported by `visrag_train`:
+  #   transform.query.instructions.by_source
+  #   transform.query.instructions.fallback
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instructions.by_source
+  #   transform.positive.instructions.fallback
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: visrag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/visrag_indomain_ArxivQA
+  transform: *visrag_train_transform_defaults
+  # samples: 25856
+  weight: 2.4
+
+visrag-indomain_PlotQA:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "This query relates to retrieving a relevant plot or chart that visually represents numerical data. The retrieved figure should contain the necessary information to analyze trends, compare values, or extract key insights related to the query: How many groups of bars are there ?\n"
+  # example positive: "<|image_pad|>\nA numerical data visualization, such as bar charts or line graphs.\n"
+  # example negative: ""
+  # transform defaults supported by `visrag_train`:
+  #   transform.query.instructions.by_source
+  #   transform.query.instructions.fallback
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instructions.by_source
+  #   transform.positive.instructions.fallback
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: visrag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/visrag_indomain_PlotQA
+  transform: *visrag_train_transform_defaults
+  # samples: 56192
+  weight: 4.5
+
+visrag-indomain_SlideVQA:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "This query is related to retrieving a relevant presentation slide that visually presents structured information. The retrieved slide should contain the necessary text, charts, or graphics to provide the best answer to the query: Which country has 1,217,515 users?\n"
+  # example positive: "<|image_pad|>\nA presentation slide with text, bullet points, and diagrams.\n"
+  # example negative: ""
+  # transform defaults supported by `visrag_train`:
+  #   transform.query.instructions.by_source
+  #   transform.query.instructions.fallback
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instructions.by_source
+  #   transform.positive.instructions.fallback
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: visrag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/visrag_indomain_SlideVQA
+  transform: *visrag_train_transform_defaults
+  # samples: 8192
+  weight: 1
+
+visrag-indomain_MP-DocVQA:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "This query is related to retrieving a relevant page from a multi-page document, such as reports, invoices, or research papers. The retrieved document should contain text, tables, or structured information necessary to answer the query: What is the mean value of children below 15 yrs?\n"
+  # example positive: "<|image_pad|>\nA page from a multi-page document with text or tables.\n"
+  # example negative: ""
+  # transform defaults supported by `visrag_train`:
+  #   transform.query.instructions.by_source
+  #   transform.query.instructions.fallback
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instructions.by_source
+  #   transform.positive.instructions.fallback
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: visrag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/visrag_indomain_MP-DocVQA
+  transform: *visrag_train_transform_defaults
+  # samples: 10624
+  weight: 1.2
+
+visrag-indomain_ChartQA:
+  # final query: "{text}\\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "This query is related to retrieving a relevant chart that visually represents numerical or categorical data. The retrieved chart should contain bar graphs, line charts, or other visual elements necessary to analyze trends, compare values, or extract insights related to the query: What is the ratio between very and somewhat important among Clinton supporters?\n"
+  # example positive: "<|image_pad|>\nA statistical chart comparing values or analyzing trends.\n"
+  # example negative: ""
+  # transform defaults supported by `visrag_train`:
+  #   transform.query.instructions.by_source
+  #   transform.query.instructions.fallback
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instructions.by_source
+  #   transform.positive.instructions.fallback
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: visrag_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/visrag_indomain_ChartQA
+  transform: *visrag_train_transform_defaults
+  # samples: 4224
+  weight: 0.6
+
+# ============================================================================
+# LLaVA-Hound / ShareGPTVideo
+# ============================================================================
+
+video_caption_300k:
+  # final query: "<|video_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|video_pad|>\nWrite an in-depth depiction of the video, covering all its aspects.\n"
+  # example positive: "The video opens with a view of an indoor court marked with various lines, presumably for different sports. There are four red balls aligned on the center line. In subsequent frames, people enter the frame, and a dodgeball game commences. The players are seen throwing balls at one another, maneuvering around the court to avoid being hit, and attempting to catch the balls. The participants vary in their attire, indicating a casual and informal game setting. The color contrasts of the red balls and the colored lines on the floor are visually prominent throughout the video. As the game progresses, players are occasionally hit by a ball and step out of the main play area. There appears to be good-natured interaction between the players, supportive of a friendly game rather than a competitive match.\n"
+  # example negative: ""
+  # transform defaults supported by `llavahound_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instruction
+  #   transform.positive.trailing_newline
+  type: llavahound_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/ShareGPTVideo_train_video_and_instruction
+  subset: train/sft/video_caption_300k
+  data_mode: caption_retrieval
+  transform:
+    query:
+      instruction: ""
+      instruction_body_separator: newline
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 301751
+  weight: 3.8
+
+video_caption_300k-video:
+  # final query: "{text}\\n"
+  # final positive: "{text} <|video_pad|>\\n"
+  # final negative: ""
+  # example query: "Find a video that contains the following visual content: The video opens with a view of an indoor court marked with various lines, presumably for different sports. There are four red balls aligned on the center line. In subsequent frames, people enter the frame, and a dodgeball game commences. The players are seen throwing balls at one another, maneuvering around the court to avoid being hit, and attempting to catch the balls. The participants vary in their attire, indicating a casual and informal game setting. The color contrasts of the red balls and the colored lines on the floor are visually prominent throughout the video. As the game progresses, players are occasionally hit by a ball and step out of the main play area. There appears to be good-natured interaction between the players, supportive of a friendly game rather than a competitive match.\n"
+  # example positive: "Understand the content of the provided video: <|video_pad|>\n"
+  # example negative: ""
+  # transform defaults supported by `llavahound_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instruction
+  #   transform.positive.visual_token_placement
+  #   transform.positive.trailing_newline
+  type: llavahound_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/ShareGPTVideo_train_video_and_instruction
+  subset: train/sft/video_caption_300k
+  data_mode: video_retrieval
+  transform:
+    query:
+      instruction: "Find a video that contains the following visual content:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Understand the content of the provided video:"
+      visual_token_placement: inline_end
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 301751
+  weight: 3.8
+
+video_qa_240k:
+  # final query: "<|video_pad|>\\n{text}\\n"
+  # final positive: "{text}\\n"
+  # final negative: ""
+  # example query: "<|video_pad|>\nAnswer a question based on the content of a video.\nWhat is the setting of the video?\n"
+  # example positive: "The setting of the video appears to be a newsroom with desks and computers in the background, suggesting an office environment with other personnel working.\n"
+  # example negative: ""
+  # transform defaults supported by `llavahound_train`:
+  #   transform.query.instruction
+  #   transform.query.instruction_body_separator
+  #   transform.query.trailing_newline
+  #   transform.positive.instruction
+  #   transform.positive.trailing_newline
+  # transform override: read caption text from the conversations field.
+  type: llavahound_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/ShareGPTVideo_train_video_and_instruction
+  subset: train/sft/video_240k_caption_15k
+  data_mode: caption_retrieval
+  transform:
+    query:
+      instruction: "Answer a question based on the content of a video."
+      instruction_body_separator: newline
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: ensure_single
+    negative:
+      empty: empty_multimodal_input
+  # samples: 255000
+  weight: 3.3
+
+# ============================================================================
+# Video classification / retrieval / QA / moment retrieval
+# ============================================================================
+# Expanded training entries below use dataset-owned runtimes. A few
+# Entries below use dataset-owned runtimes and public local/HF-prepared data roots.
+
+SmthSmthV2:
+  # final query: "<|video_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: "{text}"
+  # example query: "<|video_pad|>\nWhat actions or object interactions are being performed by the person in the video?\n"
+  # example positive: "holding potato next to vicks vaporub bottle"
+  # example negative: "approaching wooden box with your camera"
+  # transform defaults supported by `ssv2_train`:
+  #   transform.query.instruction
+  #   transform.query.visual_token_placement
+  #   transform.query.trailing_newline
+  #   transform.positive.trailing_newline
+  #   transform.negative.trailing_newline
+  # split options available in the converted root:
+  #   official_train / official_validation / vlm2vec_train / vlm2vec_test_1k
+  # archive-aligned default below uses `vlm2vec_train`.
+  type: ssv2_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/SmthSmthV2
+  dataset_name: SmthSmthV2
+  split: vlm2vec_train
+  num_frames: 8
+  transform:
+    query:
+      instruction: "What actions or object interactions are being performed by the person in the video?"
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: strip
+  # samples: 168913
+  weight: 2.4
+
+HMDB51:
+  # final query: "<|video_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|video_pad|>\nWhat actions or objects interactions are the person in the video doing?\n"
+  # example positive: "flic_flac"
+  # example negative: ""
+  # transform defaults supported by `hmdb51_train`:
+  #   transform.query.instruction
+  #   transform.query.visual_token_placement
+  #   transform.query.trailing_newline
+  #   transform.positive.trailing_newline
+  #   transform.negative.trailing_newline
+  #   transform.negative.empty
+  # split options available in the converted root:
+  #   official_split1_train / official_split1_test / official_split2_train /
+  #   official_split2_test / official_split3_train / official_split3_test /
+  #   vlm2vec_train / vlm2vec_test_1k
+  # archive-aligned default below uses `vlm2vec_train`.
+  # The instruction wording is intentionally kept unchanged, even though it is
+  # grammatically awkward, so training stays aligned with MMEB-V2 HMDB51 eval.
+  type: hmdb51_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/HMDB51
+  dataset_name: HMDB51
+  split: vlm2vec_train
+  num_frames: 8
+  transform:
+    query:
+      instruction: "What actions or objects interactions are the person in the video doing?"
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 10710
+  weight: 0.3
+
+UCF101:
+  # final query: "<|video_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|video_pad|>\nWhat activities or sports are being performed by the person in the video?\n"
+  # example positive: "ApplyEyeMakeup"
+  # example negative: ""
+  # transform defaults supported by `ucf101_train`:
+  #   transform.query.instruction
+  #   transform.query.visual_token_placement
+  #   transform.query.trailing_newline
+  #   transform.positive.trailing_newline
+  #   transform.negative.trailing_newline
+  #   transform.negative.empty
+  # split options available in the converted root:
+  #   official_split1_train / official_split1_test / official_split2_train /
+  #   official_split2_test / official_split3_train / official_split3_test /
+  #   vlm2vec_train / vlm2vec_test_1k
+  # archive-aligned default below uses `vlm2vec_train`.
+  type: ucf101_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/UCF101
+  dataset_name: UCF101
+  split: vlm2vec_train
+  num_frames: 8
+  transform:
+    query:
+      instruction: "What activities or sports are being performed by the person in the video?"
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 28747
+  weight: 0.6
+
+MSR-VTT:
+  # Archive parser = msrvtt. Default split excludes MMEB-V2 eval rows by video_id.
+  # Archive `MSR-VTT_rep1` through `MSR-VTT_rep4` repeated the same dataset view
+  # for oversampling. The new config folds those repeated entries into this
+  # single weight because they are not separate tasks or upstream sources. This
+  # intentionally accepts a small epoch-composition difference from archive
+  # slot-based accounting.
+  # Note: archive chose a random caption per row at map time. This entry uses
+  # `caption_selection: random` to recover that caption diversity, and keeps a
+  # mildly higher weight than deterministic first-caption sampling would need.
+  # final query: "{instruction} {caption}\\n"
+  # final positive: "<|video_pad|>\\n{instruction}\\n"
+  # final negative: ""
+  # example query: "Find a video that contains the following visual content: a car is shown\n"
+  # example positive: "<|video_pad|>\nUnderstand the content of the provided video.\n"
+  # example negative: ""
+  type: msrvtt_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/MSR-VTT
+  dataset_name: MSR-VTT
+  split: train_9k_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Find a video that contains the following visual content:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+      caption_selection: random
+    positive:
+      instruction: "Understand the content of the provided video."
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+  # samples: 9000
+  weight: 0.3
+
+MSVD:
+  # Archive parser = msvd. Default split excludes MMEB-V2 eval rows by video_id.
+  # Archive `MSVD_rep1` through `MSVD_rep4` repeated the same dataset view for
+  # oversampling. The new config folds those repeated entries into this single
+  # weight because they are not separate tasks or upstream sources. This
+  # intentionally accepts a small epoch-composition difference from archive
+  # slot-based accounting.
+  # Note: archive chose a random caption per row at map time. This entry uses
+  # `caption_selection: random` to recover that caption diversity, and keeps a
+  # mildly higher weight than deterministic first-caption sampling would need.
+  # final query: "{instruction} {caption}\\n"
+  # final positive: "<|video_pad|>\\n{instruction}\\n"
+  # final negative: ""
+  # example query: "Find the video snippet that corresponds to the given summary: a woman breaks an egg\n"
+  # example positive: "<|video_pad|>\nUnderstand the content of the provided video.\n"
+  # example negative: ""
+  type: msvd_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/MSVD
+  dataset_name: MSVD
+  split: train_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Find the video snippet that corresponds to the given summary:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+      caption_selection: random
+    positive:
+      instruction: "Understand the content of the provided video."
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+  # samples: 1200
+  weight: 0.2
+
+DiDeMo:
+  # Archive parser = didemo. Default split excludes MMEB-V2 eval rows by video path.
+  # final query: "{instruction} {description}\\n"
+  # final positive: "<|video_pad|>\\n{instruction}\\n"
+  # final negative: ""
+  # example query: "Find a video that includes the following described scenes: camera zooms in on baby for the first time. the slobber drips from the babies mouth onto the floor, zoomed in. the baby drops her head.\n"
+  # example positive: "<|video_pad|>\nUnderstand the content of the provided video.\n"
+  # example negative: ""
+  type: didemo_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/DiDeMo
+  dataset_name: DiDeMo
+  split: train_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Find a video that includes the following described scenes:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Understand the content of the provided video."
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 8395
+  weight: 0.2
+
+YouCook2:
+  # Archive parser = youcook2_train. The newer youcook2_train_fix path is not
+  # used here because this rewrite targets the audited original train view.
+  # final query: "{instruction} {caption}\\n"
+  # final positive: "<|video_pad|>\\n{instruction}\\n"
+  # final negative: ""
+  # example query: "Find a video that demonstrates the following action while making a recipe: pour water half and half and macaroni to the pan\n"
+  # example positive: "<|video_pad|>\nUnderstand the content of the provided video.\n"
+  # example negative: ""
+  # split options available in the converted root:
+  #   official_train / official_train_without_mmeb_v2_eval
+  # default below uses the full audited train split because MMEB-V2 YouCook2 eval
+  # has zero youtube-id / segment-stem overlap with the source training rows.
+  type: youcook2_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/YouCook2
+  dataset_name: YouCook2
+  split: official_train_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Find a video that demonstrates the following action while making a recipe:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Understand the content of the provided video."
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+  # samples: 10330
+  weight: 0.3
+
+ActivityNet-Captions:
+  # Archive has no ActivityNet Captions train parser. This rewrite uses the
+  # explicit project decision recorded in expand-training-dataset-catalog:
+  # segment-level text-to-video retrieval, one row per sentence/timestamp pair.
+  # final query: "{instruction} {segment_sentence}\\n"
+  # final positive: "<|video_pad|>\\n{instruction}\\n"
+  # final negative: ""
+  # example query: "Find the video segment that corresponds to the following description: A young woman is seen standing in a room and leads into her dancing.\n"
+  # example positive: "<|video_pad|>\nUnderstand the content of the provided video segment.\n"
+  # example negative: ""
+  # split options available in the converted root:
+  #   official_train / official_val1 / official_val2 / official_train_without_mmeb_v2_eval
+  # default below uses train rows because MMEB-V2 ActivityNetQA eval has zero
+  # video-id overlap with ActivityNet Captions train.
+  type: activitynet_captions_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/ActivityNet-Captions
+  dataset_name: ActivityNet-Captions
+  split: official_train_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Find the video segment that corresponds to the following description:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Understand the content of the provided video segment."
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+  # samples: 37421
+  # source train videos: 10009, expanded by sentence/timestamp segment
+  weight: 0.7
+
+Place365:
+  # final query: "<|image_pad|>\\nIdentify the scene shown in the image\\n"
+  # final positive: "{class_name}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nIdentify the scene shown in the image\n"
+  # example positive: "airfield"
+  # example negative: ""
+  # split options available in the converted root:
+  #   official_train / official_val / official_train_without_mmeb_v2_eval
+  # default below keeps `official_val` held out.
+  type: place365_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/Place365
+  dataset_name: Place365
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Identify the scene shown in the image"
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 1803460
+  weight: 12.2
+
+Country211:
+  # final query: "<|image_pad|>\\nIdentify the country depicted in the image\\n"
+  # final positive: "{class_name}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nIdentify the country depicted in the image\n"
+  # example positive: "Brazil"
+  # example negative: ""
+  # split options available in the converted root:
+  #   official_train / official_test / official_train_without_mmeb_v2_eval
+  # default below keeps `official_test` held out because MMEB-V2 Country211 aligns with the eval split.
+  type: country211_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/Country211
+  dataset_name: Country211
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Identify the country depicted in the image"
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 31650
+  weight: 0.5
+
+ScienceQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: What is the shadow covering?\n"
+  # example positive: "the moon"
+  # example negative: ""
+  # transform parameters below document the current defaults. Changing them
+  # should not require reconverting Lance storage.
+  # split options available in the converted root:
+  #   official_train / official_validation / official_test / official_train_without_mmeb_v2_eval
+  # default below uses the full official train view; ScienceQA MMEB-V2 eval overlap is tracked as official_test.
+  type: scienceqa_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/ScienceQA
+  dataset_name: ScienceQA
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Represent the given image with the following question:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 6218
+  weight: 0.1
+
+GQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: What is on the white wall?\n"
+  # example positive: "The pipe is on the wall."
+  # example negative: ""
+  # transform parameters below document the current defaults. Changing them
+  # should not require reconverting Lance storage.
+  # split options available in the converted root:
+  #   official_train_all / official_train_all_without_mmeb_v2_eval
+  #   official_train_balanced / official_train_balanced_without_mmeb_v2_eval
+  # default below uses the official balanced train view after excluding MMEB-V2 eval.
+  # NOTE: full train_all has 14,305,356 question rows over 74,256 images. It is
+  # preserved as an explicit full-source view, but should not be the default
+  # expanded-training entry because it would dominate the image budget.
+  type: gqa_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/GQA
+  dataset_name: GQA
+  split: official_train_balanced_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Represent the given image with the following question:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 943000
+  weight: 7.3
+
+TextVQA:
+  # final query: "<|image_pad|>\\n{text}\\n"
+  # final positive: "{text}"
+  # final negative: ""
+  # example query: "<|image_pad|>\nRepresent the given image with the following question: what is the brand of phone?\n"
+  # example positive: "nokia"
+  # example negative: ""
+  # transform parameters below document the current defaults. Changing them
+  # should not require reconverting Lance storage.
+  # split options available in the converted root:
+  #   official_train / official_validation / official_test / official_train_without_mmeb_v2_eval
+  # default below uses the full official train view after excluding MMEB-V2 eval by
+  # normalized `(question, positive answer)` pairs.
+  type: textvqa_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/TextVQA
+  dataset_name: TextVQA
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Represent the given image with the following question:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 34496
+  weight: 0.6
+
+Wiki-SS-NQ:
+  # final query: "{text}\n"
+  # final positive: "<|image_pad|>\\n{text}\\n"
+  # final negative: ""
+  # example query: "Find the document image that can answer the given query: who founded the red cross to relieve the suffering of the war wounded\n"
+  # example positive: "<|image_pad|>\nRepresent the given image\n"
+  # example negative: ""
+  # transform parameters below document the current defaults. Changing them
+  # should not require reconverting Lance storage.
+  # split options available in the converted root:
+  #   official_train_raw / official_train / official_train_without_mmeb_v2_eval
+  # default below keeps MMEB-V2 eval-overlap queries filtered out with explicit naming.
+  type: wikissnq_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/Wiki-SS-NQ
+  dataset_name: Wiki-SS-NQ
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Find the document image that can answer the given query:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Represent the given image"
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 332518
+  weight: 3.3
+
+Breakfast:
+  # final query: "<|video_pad|>\\n{text}\\n"
+  # final positive: "{label}"
+  # final negative: ""
+  # example query: "<|video_pad|>\nRecognize the breakfast type that the person is cooking in the video.\n"
+  # example positive: "cereal"
+  # example negative: ""
+  # transform parameters below document the current defaults. Changing them
+  # should not require reconverting Lance storage.
+  # split options available in the converted root:
+  #   official_s1 / official_s2 / official_s3 / official_s4 / archive_train_non_cam01 / vlm2vec_test_cam01_433
+  # archive-aligned default below uses `archive_train_non_cam01`, which is the
+  # full non-cam01 train view and excludes the MMEB-V2 eval cam01 view.
+  type: breakfast_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/Breakfast
+  dataset_name: Breakfast
+  split: archive_train_non_cam01
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Recognize the breakfast type that the person is cooking in the video."
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 1556
+  weight: 0.1
+
+Charades-STA:
+  # final query: "<|video_pad|>\\n{instruction} {description}\\n"
+  # final positive: "<|video_pad|>\\n{instruction}\\n"
+  # final negative: ""
+  # example query: "<|video_pad|>\nFind the clip that corresponds to the described scene in the given video: a person is putting a book on a shelf.\n"
+  # example positive: "<|video_pad|>\nUnderstand the content of the provided video.\n"
+  # example negative: ""
+  # transform config exposes the default Charades-STA runtime text policy.
+  # split options available in the converted root:
+  #   official_train / official_test / official_train_without_mmeb_v2_eval
+  # default below keeps `official_test` held out.
+  type: charades_sta_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/Charades-STA
+  dataset_name: Charades-STA
+  split: official_train_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Find the clip that corresponds to the described scene in the given video:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Understand the content of the provided video."
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 12408
+  weight: 0.3
+
+# MMLongBench-doc:
+#   # Archive parser = MMLongBench_doc_train. The upstream train parquet has
+#   # 1091 raw rows; 473 rows have exactly one evidence page and a renderable
+#   # PDF page, which is the only case the archive parser used. MMEB-V2
+#   # MMLongBench-doc eval overlaps 469 of those 473 questions, so the default
+#   # split keeps only the 4
+#   # non-overlapping rows. Use `official_train` only for archive reproduction,
+#   # not for leak-free training.
+#   # final query: "{instruction} {question}\\n"
+#   # final positive: "<|image_pad|>\\n{text}\\n"
+#   # final negative: ""
+#   # example query: "Find a document image that matches the given query: List all the different icons about networks that can be found in Status Bar\\n"
+#   # example positive: "<|image_pad|>\nUnderstand the content of the provided document image.\n"
+#   # example negative: ""
+#   type: mmlongbench_doc_train
+#   path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/MMLongBench-doc
+#   dataset_name: MMLongBench-doc
+#   split: official_train_without_mmeb_v2_eval
+#   transform:
+#     query:
+#       instruction: "Find a document image that matches the given query:"
+#       instruction_body_separator: space
+#       trailing_newline: ensure_single
+#     positive:
+#       instruction: "Understand the content of the provided document image."
+#       visual_token_placement: own_line
+#       trailing_newline: ensure_single
+#     negative:
+#       trailing_newline: ensure_single
+#       empty: empty_multimodal_input
+#   # disabled samples: 4
+#   weight: 0.3
+
+# ============================================================================
+# M-BEIR
+# ============================================================================
+
+OVEN_it2t_train:
+  # archive parser = mbeir, task_id=6.
+  # final query: "<|image_pad|>\\n{instruction} {query_txt}\\n"
+  # final positive: "{positive_txt}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nRetrieve a Wikipedia paragraph that provides an answer to the given query about the image. What is the manufacturer of this aircraft?\n"
+  # example positive: "Antonov. Antonov State Enterprise (), formerly the Aeronautical Scientific-Technical Complex named after Antonov (Antonov ASTC) (), and earlier the Antonov Design Bureau, for its chief designer, Oleg Antonov, is a Ukrainian aircraft manufacturing and services company. Antonov's particular expertise is in the fields of very large aeroplanes and aeroplanes using unprepared runways. Antonov (model prefix \"An-\") has built a total of approximately 22,000 aircraft, and thousands of its planes are operating in the former Soviet Union and in developing countries.Antonov StC is a state-owned commercial company. Its headquarters and main industrial grounds were originally located in Novosibirsk, and in 1952 were.\n"
+  # example negative: ""
+  # split options available in the converted root:
+  #   official_train / official_train_without_mmeb_v2_eval
+  type: mbeir_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/M-BEIR
+  dataset_name: OVEN_it2t_train
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Retrieve a Wikipedia paragraph that provides an answer to the given query about the image."
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: ""
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 132399
+  weight: 1.6
+
+OVEN_it2it_train:
+  # archive parser = mbeir, task_id=8.
+  # final query: "<|image_pad|>\\n{instruction} {query_txt}\\n"
+  # final positive: "<|image_pad|>\\n{instruction} {positive_txt}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nRetrieve a Wikipedia image-description pair that provides evidence for the question of this image: What is the model of this aircraft?\n"
+  # example positive: "<|image_pad|>\nRepresent the given Wikipedia image with related text information: Dassault Falcon 900. The Dassault Falcon 900, commonly abbreviated as the F900, is a French-built corporate trijet aircraft made by Dassault Aviation.## Development.The Falcon 900 is a development of the Falcon 50, itself a development of the earlier Falcon 20. The Falcon 900 design incorporates composite materials.Other models include the Falcon 900-B, featuring an increased range, and the Falcon 900EX featuring other improvements in engines and range and an all-glass flight deck. The Falcon 900C is a companion to the Falcon 900EX and replaces the Falcon 900B. Later versions are the Falcon 900EX EASy and the Falcon 900DX. At EBACE 2008, Dassault announced.\n"
+  # example negative: ""
+  type: mbeir_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/M-BEIR
+  dataset_name: OVEN_it2it_train
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Retrieve a Wikipedia image-description pair that provides evidence for the question of this image:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Represent the given Wikipedia image with related text information:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 143051
+  weight: 1.7
+
+EDIS_train:
+  # archive parser = mbeir, task_id=2.
+  # final query: "{instruction} {query_txt}\\n"
+  # final positive: "<|image_pad|>\\n{instruction} {positive_txt}\\n"
+  # final negative: ""
+  # example query: "Find a news image that matches the provided caption: The president, speaking in Camden, N.J., on Monday, announced new policies that will limit military-style equipment being provided to local police forces by the federal government.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image with related text information: Obama on ‘Militarized Gear’ for Police.\n"
+  # example negative: ""
+  type: mbeir_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/M-BEIR
+  dataset_name: EDIS_train
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Find a news image that matches the provided caption:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Represent the given image with related text information:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 22676
+  weight: 0.4
+
+FashionIQ_train:
+  # archive parser = mbeir, task_id=7.
+  # final query: "<|image_pad|>\\n{instruction} {query_txt}\\n"
+  # final positive: "<|image_pad|>\\n{instruction}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nFind an image to match the fashion image and style note: Is red black and gray and is a darker print.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mbeir_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/M-BEIR
+  dataset_name: FashionIQ_train
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Find an image to match the fashion image and style note:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Represent the given image."
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 10755
+  weight: 0.2
+
+INFOSEEK_it2t:
+  # archive parser = mbeir, task_id=6.
+  # final query: "<|image_pad|>\\n{instruction} {query_txt}\\n"
+  # final positive: "{positive_txt}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nRetrieve a Wikipedia paragraph that provides an answer to the given query about the image. Which culture is associated with this vehicle?\n"
+  # example positive: "Kayak. considerably from a traditional design but still claim the title \"kayak\", for instance in eliminating the cockpit by seating the paddler on top of the boat (\"sit-on-top\" kayaks); having inflated air chambers surrounding the boat; replacing the single hull with twin hulls; and replacing paddles with other human-powered propulsion methods, such as foot-powered rotational propellers and \"flippers\". Kayaks are also being sailed, as well as propelled by means of small electric motors, and even by outboard gasoline engines.The kayak was first used by the indigenous Aleut, Inuit, Yupik and possibly Ainu hunters in subarctic regions of the world.## History.Kayaks (Inuktitut:.\n"
+  # example negative: ""
+  type: mbeir_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/M-BEIR
+  dataset_name: INFOSEEK_it2t
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Retrieve a Wikipedia paragraph that provides an answer to the given query about the image."
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: ""
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 135613
+  weight: 1.6
+
+INFOSEEK_it2it:
+  # archive parser = mbeir, task_id=8.
+  # final query: "<|image_pad|>\\n{instruction} {query_txt}\\n"
+  # final positive: "<|image_pad|>\\n{instruction} {positive_txt}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nRetrieve a Wikipedia image-description pair that provides evidence for the question of this image: Who is the manufacturer of this vehicle?\n"
+  # example positive: "<|image_pad|>\nRepresent the given Wikipedia image with related text information: Humvee. The High Mobility Multipurpose Wheeled Vehicle (HMMWV; colloquial: Humvee) is a family of light, four-wheel drive, military trucks and utility vehicles produced by AM General. It has largely supplanted the roles previously performed by the original jeep, and others such as the Vietnam War-era M151 jeep, the M561 \"Gama Goat\", their M718A1 and M792 ambulance versions, the Commercial Utility Cargo Vehicle, and other light trucks. Primarily used by the United States military, it is also used by numerous other countries and organizations and even in civilian adaptations. The Humvee saw widespread use in the Gulf War of 1991, where it.\n"
+  # example negative: ""
+  type: mbeir_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/M-BEIR
+  dataset_name: INFOSEEK_it2it
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Retrieve a Wikipedia image-description pair that provides evidence for the question of this image:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Represent the given Wikipedia image with related text information:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 134330
+  weight: 1.6
+
+Fashion200K_t2i:
+  # archive parser = mbeir, task_id=0.
+  # final query: "{instruction} {query_txt}\\n"
+  # final positive: "<|image_pad|>\\n{instruction}\\n"
+  # final negative: ""
+  # example query: "Based on the following fashion description, retrieve the best matching image. Black chain belt loop trousers.\n"
+  # example positive: "<|image_pad|>\nRepresent the given image.\n"
+  # example negative: ""
+  type: mbeir_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/M-BEIR
+  dataset_name: Fashion200K_t2i
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Based on the following fashion description, retrieve the best matching image."
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Represent the given image."
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 14123
+  weight: 0.3
+
+Fashion200K_i2t:
+  # archive parser = mbeir, task_id=3.
+  # final query: "<|image_pad|>\\n{instruction}\\n"
+  # final positive: "{positive_txt}\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nFind a product description for the fashion item in the image.\n"
+  # example positive: "Green women's leather jacket.\n"
+  # example negative: ""
+  type: mbeir_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/M-BEIR
+  dataset_name: Fashion200K_i2t
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Find a product description for the fashion item in the image."
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: ""
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 12558
+  weight: 0.3
+
+QVHighlights:
+  # final query: "<|video_pad|>\\n{instruction} {query}\\n"
+  # final positive: "<|video_pad|>\\n{instruction}\\n"
+  # final negative: ""
+  # example query: "<|video_pad|>\nFind the clip that corresponds to the described scene in the given video: some military patriots takes us through their safety procedures and measures.\n"
+  # example positive: "<|video_pad|>\nUnderstand the content of the provided video.\n"
+  # example negative: ""
+  # transform config exposes the default QVHighlights runtime text policy.
+  # positive.window_selection=random matches the origin parser, which samples
+  # one relevant window for each runtime example.
+  # split options available in the converted root:
+  #   official_train / official_val / official_test / official_train_without_mmeb_v2_eval
+  # default below keeps `official_val` held out because MMEB-V2 QVHighlight aligns with raw val queries.
+  type: qvhighlight_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/QVHighlights
+  dataset_name: QVHighlights
+  split: official_train_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Find the clip that corresponds to the described scene in the given video:"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Understand the content of the provided video."
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+      window_selection: random
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 7218
+  weight: 0.2
+
+NEXTQA:
+  # final query: "<|video_pad|>\\nGiven a video and a question, select the most accurate answer from the provided candidates. Return only the exact text of your chosen answer. Question: {question}\\nOptions:\\n(A) {options[0]}\\n(B) {options[1]}\\n(C) {options[2]}\\n(D) {options[3]}\\n(E) {options[4]}\\n"
+  # final positive: "{options[int(answer)]}"
+  # final negative: ""
+  # example query: "<|video_pad|>\nGiven a video and a question, select the most accurate answer from the provided candidates. Return only the exact text of your chosen answer. Question: how many children are in the video\nOptions:\n(A) one\n(B) three\n(C) seven\n(D) two\n(E) five\n"
+  # example positive: "two"
+  # example negative: ""
+  # split options available in the converted root:
+  #   official_train / official_train_without_mmeb_v2_eval
+  # default below uses the full audited train split because MMEB-V2 NExTQA eval
+  # has zero video-id overlap with the source training rows.
+  type: nextqa_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/NExTQA
+  dataset_name: NExTQA
+  split: official_train_without_mmeb_v2_eval
+  num_frames: 8
+  transform:
+    query:
+      instruction: "Given a video and a question, select the most accurate answer from the provided candidates. Return only the exact text of your chosen answer. Question:"
+      instruction_body_separator: space
+      trailing_newline: ensure_single
+    positive:
+      trailing_newline: strip
+    negative:
+      trailing_newline: ensure_single
+  # samples: 34132
+  weight: 0.7
+
+visual7W_pointing_train:
+  # final query: "<|image_pad|>\\nSelect the portion of the image that answers the question \"{question}\"\\n"
+  # final positive: "<|image_pad|>\\nRepresent the given cropped image of the object.\\n"
+  # final negative: ""
+  # example query: "<|image_pad|>\nSelect the portion of the image that answers the question \"Which door is behind a person sitting on a bench?\"\n"
+  # example positive: "<|image_pad|>\nRepresent the given cropped image of the object.\n"
+  # example negative: ""
+  # transform parameters below document the current defaults. Changing them
+  # should not require reconverting Lance storage.
+  # split choices:
+  #   official_train_without_mmeb_v2_eval -> default training split
+  #   official_train -> raw official train split
+  #   official_val -> optional analysis/tuning split
+  #   official_test -> held out because MMEB-V2 Visual7W-Pointing likely samples from this split
+  type: visual7w_pointing_train
+  path: ${oc.env:VLM2EMB_DATA_ROOT,./data}/Visual7W-Pointing
+  dataset_name: Visual7W-Pointing
+  split: official_train_without_mmeb_v2_eval
+  transform:
+    query:
+      instruction: "Select the portion of the image that answers the question"
+      instruction_body_separator: space
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    positive:
+      instruction: "Represent the given cropped image of the object."
+      visual_token_placement: own_line
+      trailing_newline: ensure_single
+    negative:
+      trailing_newline: ensure_single
+      empty: empty_multimodal_input
+  # samples: 93813
+  weight: 1.2

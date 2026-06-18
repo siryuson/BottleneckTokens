@@ -1,0 +1,59 @@
+# VLM2Vec Experiment Configuration
+# Usage: accelerate launch scripts/train.py configs/experiments/vlm2vec.yaml
+#
+# Logging Options
+#   - Terminal only (default): report_to: "none"
+#   - WandB tracking: report_to: "wandb"
+#   - Multiple trackers: report_to: ["wandb", "tensorboard"]
+#   - Disable WandB for debugging: WANDB_MODE=disabled accelerate launch ...
+
+global:
+  interleave_batch_size: 64
+
+# ==================== Model
+model:
+  _inherit_: ../models/vlm2vec.yaml
+
+# ==================== PEFT Configuration
+peft:
+  _inherit_: ../peft/lora_default.yaml
+  alpha: 64
+  dropout: 0.1
+
+# ==================== Training
+train:
+  dataset:
+    type: batch_interleave
+    batch_size: ${global.interleave_batch_size}
+    num_shards: 16
+    seed: 42
+    stopping_strategy: all_exhausted
+    datasets:
+      _inherit_: ../datasets/mmeb_train.yaml
+
+  collator:
+    type: training
+
+  trainer:
+    type: vlm2vec_trainer
+
+  args:
+    _inherit_: ../training/vlm2vec_base.yaml
+    output_dir: ./outputs/vlm2vec
+
+    gc_chunk_size: 4
+
+    interleave_batch_size: ${global.interleave_batch_size}
+    per_device_train_batch_size: 32
+
+    learning_rate: 1.0e-5
+    warmup_ratio: 0.1
+
+    max_steps: 10
+
+    save_steps: 500
+    save_total_limit: 3
+
+    dataloader_num_workers: 16
+    dataloader_persistent_workers: false
+    dataloader_prefetch_factor: null

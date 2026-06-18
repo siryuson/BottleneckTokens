@@ -1,0 +1,72 @@
+# ================================================================
+# BToks Training Arguments Baseline
+# ================================================================
+# Shared training arguments for BToks presets.
+#
+# Usage in preset
+#   train:
+#     args:
+#       _inherit_: ../training/btoks_base.yaml
+#       output_dir: ./outputs/my_btoks_experiment
+#       run_name: my_btoks_experiment
+# ================================================================
+
+type: btoks
+
+# GradCache
+use_grad_cache: true
+gc_chunk_size: 4
+
+# BToks generation-loss schedule. The generation branch trains only during the
+# warm-up window controlled by generation_loss_duration.
+generation_loss_weight: 5.0
+generation_loss_duration: 2000
+generation_kv_mode: compressed
+generation_prefix_text: "<|im_start|>assistant\n"
+generation_suffix_text: "<|im_end|>"
+# Whether the appended end-boundary token(s) should be supervised by generation loss.
+include_generation_suffix_in_loss: true
+
+# Contrastive loss
+temperature: 0.02
+
+# Batch / data mixing
+per_device_train_batch_size: 128
+interleave_batch_size: 512
+interleave_stopping_strategy: all_exhausted
+remove_unused_columns: false
+
+# Optimization
+learning_rate: 5.0e-5
+lr_scheduler_type: linear
+weight_decay: 0.01
+warmup_steps: 100
+max_grad_norm: 1.0
+optim: adamw_torch
+
+# Duration
+max_steps: 5000
+
+# Logging
+logging_steps: 1
+logging_first_step: true
+report_to: "none"
+
+# Checkpoint
+save_strategy: steps
+save_steps: 50
+save_safetensors: true
+
+# Precision
+bf16: true
+
+# Dataloader
+dataloader_num_workers: 4
+dataloader_pin_memory: true
+dataloader_persistent_workers: true
+dataloader_prefetch_factor: 2
+
+# Reproducibility
+seed: 42
+
+do_eval: true

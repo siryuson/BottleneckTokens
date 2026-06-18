@@ -1,0 +1,23 @@
+# VLM2Vec Default Model Configuration
+#
+# This is the default configuration file. For model-specific configs, use:
+#   - vlm2vec_qwen2vl_2b.yaml  # Qwen2-VL-2B
+#   - vlm2vec_qwen3vl_2b.yaml  # Qwen3-VL-2B
+#
+# Pipeline: Backbone -> LastTokenPooling -> Normalize
+
+type: VLM2Emb
+
+modules:
+  backbone:
+    type: Qwen2VLBackbone
+    model_name_or_path: Qwen/Qwen2-VL-2B-Instruct
+    dtype: bfloat16
+    attn_implementation: flash_attention_2
+    trust_remote_code: true
+
+  pooling:
+    type: LastTokenPooling
+
+  normalize:
+    type: Normalize

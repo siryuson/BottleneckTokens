@@ -1,0 +1,502 @@
+# ============================================================================
+# Expanded training dataset v3 Stage 1 catalog layer
+# ============================================================================
+#
+# - Inherits the v2 full-training mixture.
+# - Adds a non-runtime `_stage1_candidates` catalog for future Stage 1 dataset
+#   conversion work.
+# - `_stage1_candidates` entries are documentation metadata only. The combined
+#   dataset builder ignores underscore-prefixed keys because they do not define
+#   a registry `type`.
+# - Blocked, license-sensitive, or eval-only entries must stay catalog-only
+#   until they have public provenance and a runtime-safe loader.
+#
+# Stage 1 is intended for text bootstrapping and public pretraining-style data.
+# Stage 2 remains the MMEB-V2-aligned multimodal training mixture.
+
+_inherit_: ./expanded_train_datasets_v2.yaml
+
+_stage1_candidates:
+  text_bootstrapping:
+    rationale: "Use text-only retrieval and entailment pairs to strengthen the base embedding space before multimodal alignment."
+    priority:
+      - dataset: SNLI
+        status: train_candidate
+        target_stage: stage1
+        task_view: text_entailment
+      - dataset: MNLI
+        status: train_candidate
+        target_stage: stage1
+        task_view: text_entailment
+      - dataset: AllNLI
+        status: train_candidate
+        target_stage: stage1
+        task_view: text_entailment
+      - dataset: MSMARCO Passage
+        status: train_candidate
+        target_stage: stage1
+        task_view: text_retrieval
+      - dataset: Natural Questions
+        status: train_candidate
+        target_stage: stage1
+        task_view: text_qa_retrieval
+      - dataset: HotpotQA
+        status: train_candidate
+        target_stage: stage1
+        task_view: text_multi_hop_retrieval
+
+  image_text_pre_alignment:
+    rationale: "Use large image-text pair sources for coarse cross-modal alignment; do not add raw full web-scale sources to Stage 2."
+    priority:
+      - dataset: CC12M
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: CC3M
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: PixelProse
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: ShareGPT4V
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: Recap-DataComp-1B
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: DataComp-1B
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: LAION-COCO
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: LAION-400M
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: LAION-5B
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: COYO-700M
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: WIT
+        status: pretrain_only
+        target_stage: stage1
+        task_view: multilingual_image_text_pair
+      - dataset: RedCaps
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair
+      - dataset: OpenImages V7
+        status: pretrain_only
+        target_stage: stage1
+        task_view: image_text_pair_or_detection_labels
+
+  image_text_retrieval_and_cir:
+    rationale: "Prioritize retrieval-shaped data and composed image retrieval because their objectives match embedding training."
+    priority:
+      - dataset: Flickr30K
+        status: train_candidate
+        target_stage: stage1
+        task_view: image_text_retrieval
+      - dataset: LaSCo
+        status: formal_candidate
+        target_stage: stage1_and_stage2
+        task_view: composed_image_retrieval
+      - dataset: SNLI-VE
+        status: formal_candidate
+        target_stage: stage1_and_stage2
+        task_view: visual_entailment
+      - dataset: MagicLens
+        status: synthetic_candidate
+        target_stage: stage1
+        task_view: composed_image_retrieval
+      - dataset: MegaPairs
+        status: synthetic_candidate
+        target_stage: stage1
+        task_view: composed_image_retrieval
+      - dataset: mmE5 synthetic
+        status: synthetic_candidate
+        target_stage: stage1_and_stage2_sampled
+        task_view: multimodal_retrieval
+      - dataset: GME Wikipedia synthetic
+        status: synthetic_candidate
+        target_stage: stage1
+        task_view: knowledge_image_text_retrieval
+
+  fine_grained_image_retrieval:
+    rationale: "Use metric-learning datasets to improve image-image discrimination; sample carefully to avoid over-specializing Stage 2."
+    priority:
+      - dataset: Stanford Online Products
+        status: formal_candidate
+        target_stage: stage1_and_stage2_sampled
+        task_view: image_image_retrieval
+      - dataset: DeepFashion In-Shop
+        status: formal_candidate
+        target_stage: stage1_and_stage2_sampled
+        task_view: image_image_retrieval
+      - dataset: Google Landmarks v2
+        status: train_candidate
+        target_stage: stage1
+        task_view: image_image_retrieval
+      - dataset: iNaturalist 2018
+        status: train_candidate
+        target_stage: stage1
+        task_view: fine_grained_classification_or_retrieval
+      - dataset: CUB-200-2011
+        status: train_candidate
+        target_stage: stage1
+        task_view: fine_grained_classification_or_retrieval
+      - dataset: Stanford Cars
+        status: train_candidate
+        target_stage: stage1
+        task_view: fine_grained_classification
+      - dataset: Oxford Pets
+        status: train_candidate
+        target_stage: stage1
+        task_view: fine_grained_classification
+      - dataset: Oxford Flowers 102
+        status: train_candidate
+        target_stage: stage1
+        task_view: fine_grained_classification
+      - dataset: FGVC-Aircraft
+        status: train_candidate
+        target_stage: stage1
+        task_view: fine_grained_classification
+
+  visual_grounding:
+    rationale: "Use region-level data to improve local alignment, crop matching, and referring-expression retrieval."
+    priority:
+      - dataset: RefCOCO+
+        status: train_candidate
+        target_stage: stage1
+        task_view: visual_grounding
+      - dataset: RefCOCOg
+        status: train_candidate
+        target_stage: stage1
+        task_view: visual_grounding
+      - dataset: Flickr30K Entities
+        status: train_candidate
+        target_stage: stage1
+        task_view: phrase_grounding
+      - dataset: Visual Genome regions
+        status: train_candidate
+        target_stage: stage1
+        task_view: region_description_matching
+      - dataset: Objects365
+        status: train_candidate
+        target_stage: stage1
+        task_view: detection_label_or_region_matching
+
+  visual_reasoning_and_vqa:
+    rationale: "Use reasoning and QA data as matching pairs only after defining answer selection, negatives, and overlap keys."
+    priority:
+      - dataset: NLVR2
+        status: train_candidate
+        target_stage: stage1
+        task_view: visual_reasoning_matching
+      - dataset: VCR
+        status: train_candidate
+        target_stage: stage1
+        task_view: visual_commonsense_qa
+      - dataset: VQAv2
+        status: train_candidate
+        target_stage: stage1
+        task_view: visual_qa
+      - dataset: Encyclopedic-VQA
+        status: train_candidate
+        target_stage: stage1
+        task_view: knowledge_visual_qa
+      - dataset: AI2D
+        status: train_candidate
+        target_stage: stage1
+        task_view: diagram_qa
+      - dataset: OCR-VQA
+        status: train_candidate
+        target_stage: stage1
+        task_view: ocr_visual_qa
+
+  visual_document_and_ui:
+    rationale: "Use high-quality document/page/UI datasets for Stage 1, then keep only directly relevant subsets in Stage 2."
+    priority:
+      - dataset: Docmatix
+        status: train_candidate
+        target_stage: stage1
+        task_view: document_qa
+      - dataset: ScreenQA
+        status: train_candidate
+        target_stage: stage1_and_stage2_if_ui_targeted
+        task_view: ui_screenshot_qa
+      - dataset: Screen2Words
+        status: train_candidate
+        target_stage: stage1_and_stage2_if_ui_targeted
+        task_view: ui_screenshot_captioning
+      - dataset: WebSRC
+        status: train_candidate
+        target_stage: stage1_and_stage2_if_ui_targeted
+        task_view: webpage_screenshot_qa
+      - dataset: MP-DocVQA
+        status: covered_or_train_candidate
+        target_stage: stage1
+        task_view: multipage_document_qa
+      - dataset: TAT-QA
+        status: covered_or_train_candidate
+        target_stage: stage1
+        task_view: financial_table_qa
+      - dataset: ArxivQA
+        status: covered_or_train_candidate
+        target_stage: stage1
+        task_view: paper_figure_or_page_qa
+      - dataset: PlotQA
+        status: covered_or_train_candidate
+        target_stage: stage1
+        task_view: chart_qa
+
+  video_pre_alignment_and_retrieval:
+    rationale: "Use large video-text sources for temporal alignment; Stage 2 should retain only benchmark-related train splits."
+    priority:
+      - dataset: WebVid-10M
+        status: pretrain_only
+        target_stage: stage1
+        task_view: video_text_pair
+      - dataset: InternVid
+        status: pretrain_only
+        target_stage: stage1
+        task_view: video_text_pair
+      - dataset: HowTo100M
+        status: pretrain_only
+        target_stage: stage1
+        task_view: video_asr_text_pair
+      - dataset: VideoInstruct100K
+        status: train_candidate
+        target_stage: stage1
+        task_view: video_instruction
+      - dataset: LLaVA-OneVision
+        status: train_candidate
+        target_stage: stage1
+        task_view: image_video_instruction
+      - dataset: OpenGVLab/VideoChat2-IT-clean
+        status: partial_enabled_v2_remaining_candidate
+        target_stage: stage1_and_stage2_sampled
+        task_view: split_video_instruction_family
+        source_repos:
+          - OpenGVLab/VideoChat2-IT
+          - byminji/VideoChat2-IT-clean
+        total_valid_samples: 877489
+        split_policy: separate_subsets
+        media_policy: media_backed_subsets_enabled_in_v2_remaining_subsets_require_original_video_sources
+        notes: "The v2 VideoChat2-IT entry enables only media-backed rows from next_qa, youcook2, ssv2, k710, and videochatgpt; remaining subsets stay audit-only."
+        subsets:
+          - name: textvr
+            task_view: video_caption
+            source_family: TextVR
+            valid_samples: 39648
+            overlap_with_existing: no_known_current_overlap
+            decision: keep_candidate
+          - name: youcook2
+            task_view: video_caption
+            source_family: YouCook2
+            valid_samples: 8700
+            overlap_with_existing: duplicates_youcook2_train_family
+            decision: partial_enabled_media_backed_rows
+          - name: k710
+            task_view: video_classification
+            source_family: Kinetics
+            valid_samples: 38977
+            overlap_with_existing: high_overlap_risk_with_kinetics700_train
+            decision: partial_enabled_media_backed_rows
+          - name: ssv2
+            task_view: video_classification
+            source_family: Something-Something-V2
+            valid_samples: 40000
+            overlap_with_existing: duplicates_ssv2_train_family
+            decision: enabled_media_backed_rows
+          - name: videochat2
+            task_view: video_conversation
+            source_family: InternVid
+            valid_samples: 9584
+            overlap_with_existing: no_known_current_overlap
+            decision: keep_candidate
+          - name: videochatgpt
+            task_view: video_conversation
+            source_family: ActivityNet
+            valid_samples: 13303
+            overlap_with_existing: possible_activitynet_captions_or_activitynetqa_overlap
+            decision: enabled_media_backed_rows
+          - name: next_qa
+            task_view: video_reasoning
+            source_family: NExT-QA
+            valid_samples: 34132
+            overlap_with_existing: duplicates_nextqa_train
+            decision: enabled_media_backed_rows
+          - name: clevrer_qa
+            task_view: video_reasoning
+            source_family: CLEVRER
+            valid_samples: 40000
+            overlap_with_existing: no_known_training_root_overlap_but_mvbench_eval_family_overlap_risk
+            decision: keep_candidate_after_mvbench_overlap_audit
+          - name: clevrer_mc
+            task_view: video_reasoning
+            source_family: CLEVRER
+            valid_samples: 40000
+            overlap_with_existing: no_known_training_root_overlap_but_mvbench_eval_family_overlap_risk
+            decision: keep_candidate_after_mvbench_overlap_audit
+          - name: ego_qa
+            task_view: egocentric_video_qa
+            source_family: EgoQA
+            valid_samples: 7797
+            overlap_with_existing: no_known_current_overlap_but_egoschema_proxy
+            decision: keep_candidate_without_ego4d_full
+          - name: tgif_frame_qa
+            task_view: video_vqa
+            source_family: TGIF
+            valid_samples: 39149
+            overlap_with_existing: no_known_training_root_overlap_but_mvbench_eval_family_overlap_risk
+            decision: keep_candidate_after_mvbench_overlap_audit
+          - name: tgif_transition_qa
+            task_view: video_vqa
+            source_family: TGIF
+            valid_samples: 52696
+            overlap_with_existing: no_known_training_root_overlap_but_mvbench_eval_family_overlap_risk
+            decision: keep_candidate_after_mvbench_overlap_audit
+          - name: webvid
+            task_view: video_caption
+            source_family: WebVid
+            valid_samples: 399740
+            overlap_with_existing: possible_sharegptvideo_or_llavahound_overlap
+            decision: stage1_sampled_only_after_dedup
+          - name: videochat
+            task_view: video_caption
+            source_family: WebVid
+            valid_samples: 6889
+            overlap_with_existing: possible_sharegptvideo_or_llavahound_overlap
+            decision: audit_before_keep
+          - name: videochat1
+            task_view: video_conversation
+            source_family: WebVid
+            valid_samples: 4300
+            overlap_with_existing: possible_sharegptvideo_or_llavahound_overlap
+            decision: audit_before_keep
+          - name: webvid_qa
+            task_view: video_vqa
+            source_family: WebVid
+            valid_samples: 99954
+            overlap_with_existing: possible_sharegptvideo_or_llavahound_overlap
+            decision: stage1_sampled_only_after_dedup
+      - dataset: MSRVTT-QA
+        status: formal_candidate
+        target_stage: stage1_and_stage2
+        task_view: video_qa
+      - dataset: MSVD-QA
+        status: formal_candidate
+        target_stage: stage1_and_stage2
+        task_view: video_qa
+      - dataset: ActivityNet-QA
+        status: formal_candidate
+        target_stage: stage1_and_stage2
+        task_view: video_qa
+      - dataset: TVQA
+        status: train_candidate
+        target_stage: stage1
+        task_view: video_subtitle_qa
+      - dataset: iVQA
+        status: train_candidate
+        target_stage: stage1
+        task_view: video_qa
+      - dataset: Kinetics-400
+        status: train_candidate
+        target_stage: stage1
+        task_view: video_classification
+      - dataset: Diving48
+        status: train_candidate
+        target_stage: stage1
+        task_view: fine_grained_video_classification
+      - dataset: FineGym
+        status: train_candidate
+        target_stage: stage1
+        task_view: fine_grained_video_classification
+      - dataset: Epic-Kitchens-100
+        status: train_candidate
+        target_stage: stage1
+        task_view: egocentric_action_classification_or_retrieval
+
+  multilingual_multimodal:
+    rationale: "Use multilingual image/video-text data in Stage 1 when multilingual retrieval is a product goal."
+    priority:
+      - dataset: Multi30K
+        status: train_candidate
+        target_stage: stage1
+        task_view: multilingual_image_text_retrieval
+      - dataset: xFlickr&Co
+        status: train_candidate
+        target_stage: stage1
+        task_view: multilingual_image_text_retrieval
+      - dataset: COCO-CN
+        status: train_candidate
+        target_stage: stage1
+        task_view: chinese_image_text_retrieval
+      - dataset: VATEX bilingual captions
+        status: covered_or_train_candidate
+        target_stage: stage1
+        task_view: bilingual_video_text_retrieval
+      - dataset: MaXM
+        status: train_candidate
+        target_stage: stage1
+        task_view: multilingual_visual_qa
+
+  eval_only_or_diagnostic:
+    rationale: "Keep these out of default training; use them to diagnose compositionality, retrieval quality, or OOD behavior."
+    priority:
+      - dataset: CIRCO
+        status: eval_only
+        target_stage: none
+        task_view: composed_image_retrieval_eval
+      - dataset: GeneCIS
+        status: eval_only_or_small_diagnostic
+        target_stage: none
+        task_view: conditional_similarity_eval
+      - dataset: Winoground
+        status: eval_only
+        target_stage: none
+        task_view: compositional_matching_eval
+      - dataset: ARO
+        status: hard_negative_source
+        target_stage: stage2_sampled_only
+        task_view: hard_negative_diagnostic
+      - dataset: SugarCrepe
+        status: eval_only
+        target_stage: none
+        task_view: compositionality_eval
+      - dataset: R-Oxford
+        status: eval_only
+        target_stage: none
+        task_view: landmark_retrieval_eval
+      - dataset: R-Paris
+        status: eval_only
+        target_stage: none
+        task_view: landmark_retrieval_eval
+      - dataset: Video-MME
+        status: eval_only
+        target_stage: none
+        task_view: video_understanding_eval
+      - dataset: MVBench
+        status: eval_only
+        target_stage: none
+        task_view: video_understanding_eval
+      - dataset: EgoSchema
+        status: eval_only
+        target_stage: none
+        task_view: long_video_understanding_eval
+      - dataset: MomentSeeker
+        status: eval_only
+        target_stage: none
+        task_view: moment_retrieval_eval

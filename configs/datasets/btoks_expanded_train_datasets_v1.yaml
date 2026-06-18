@@ -1,0 +1,254 @@
+# BToks expanded dataset layer
+# Inherit the expanded VLM2Vec mixture and only add BToks generation target-side
+# metadata here. The base expanded config owns storage paths, transforms,
+# splits, and sampling weights.
+
+_inherit_: ./expanded_train_datasets_v1.yaml
+
+ImageNet_1K:
+  metadata:
+    ntp_side: positive
+
+N24News:
+  metadata:
+    ntp_side: positive
+
+HatefulMemes:
+  metadata:
+    ntp_side: positive
+
+VOC2007:
+  metadata:
+    ntp_side: positive
+
+SUN397:
+  metadata:
+    ntp_side: positive
+
+OK-VQA:
+  metadata:
+    ntp_side: positive
+
+A-OKVQA:
+  metadata:
+    ntp_side: positive
+
+DocVQA:
+  metadata:
+    ntp_side: positive
+
+InfographicsVQA:
+  metadata:
+    ntp_side: positive
+
+ChartQA:
+  metadata:
+    ntp_side: positive
+
+Visual7W:
+  metadata:
+    ntp_side: positive
+
+VisDial:
+  metadata:
+    ntp_side: query
+
+CIRR:
+  metadata:
+    ntp_side: none
+
+VisualNews_t2i:
+  metadata:
+    ntp_side: query
+
+VisualNews_i2t:
+  metadata:
+    ntp_side: positive
+
+MSCOCO_t2i:
+  metadata:
+    ntp_side: query
+
+MSCOCO_i2t:
+  metadata:
+    ntp_side: positive
+
+NIGHTS:
+  metadata:
+    ntp_side: none
+
+WebQA:
+  metadata:
+    ntp_side: both
+
+MSCOCO:
+  metadata:
+    ntp_side: query
+
+colpali_train_set:
+  metadata:
+    ntp_side: positive
+
+colpali_train_set_arxiv_qa:
+  metadata:
+    ntp_side: query
+
+colpali_train_set_pdf:
+  metadata:
+    ntp_side: query
+
+colpali_train_set_docvqa:
+  metadata:
+    ntp_side: query
+
+colpali_train_set_tatdqa:
+  metadata:
+    ntp_side: query
+
+colpali_train_set_Infographic-VQA:
+  metadata:
+    ntp_side: query
+
+visrag-indomain_InfoVQA:
+  metadata:
+    ntp_side: query
+
+visrag-indomain_ArxivQA:
+  metadata:
+    ntp_side: query
+
+visrag-indomain_PlotQA:
+  metadata:
+    ntp_side: query
+
+visrag-indomain_SlideVQA:
+  metadata:
+    ntp_side: query
+
+visrag-indomain_MP-DocVQA:
+  metadata:
+    ntp_side: query
+
+visrag-indomain_ChartQA:
+  metadata:
+    ntp_side: query
+
+video_caption_300k:
+  metadata:
+    ntp_side: positive
+
+video_caption_300k-video:
+  metadata:
+    ntp_side: query
+
+video_qa_240k:
+  metadata:
+    ntp_side: positive
+
+SmthSmthV2:
+  metadata:
+    ntp_side: positive
+
+HMDB51:
+  metadata:
+    ntp_side: positive
+
+UCF101:
+  metadata:
+    ntp_side: positive
+
+MSR-VTT:
+  metadata:
+    ntp_side: query
+
+MSVD:
+  metadata:
+    ntp_side: query
+
+DiDeMo:
+  metadata:
+    ntp_side: query
+
+YouCook2:
+  metadata:
+    ntp_side: query
+
+ActivityNet-Captions:
+  metadata:
+    ntp_side: query
+
+Place365:
+  metadata:
+    ntp_side: positive
+
+Country211:
+  metadata:
+    ntp_side: positive
+
+ScienceQA:
+  metadata:
+    ntp_side: positive
+
+GQA:
+  metadata:
+    ntp_side: positive
+
+TextVQA:
+  metadata:
+    ntp_side: positive
+
+Wiki-SS-NQ:
+  metadata:
+    ntp_side: query
+
+Breakfast:
+  metadata:
+    ntp_side: positive
+
+Charades-STA:
+  metadata:
+    ntp_side: query
+
+OVEN_it2t_train:
+  metadata:
+    ntp_side: positive
+
+OVEN_it2it_train:
+  metadata:
+    ntp_side: positive
+
+EDIS_train:
+  metadata:
+    ntp_side: query
+
+FashionIQ_train:
+  metadata:
+    ntp_side: none
+
+INFOSEEK_it2t:
+  metadata:
+    ntp_side: positive
+
+INFOSEEK_it2it:
+  metadata:
+    ntp_side: positive
+
+Fashion200K_t2i:
+  metadata:
+    ntp_side: query
+
+Fashion200K_i2t:
+  metadata:
+    ntp_side: positive
+
+QVHighlights:
+  metadata:
+    ntp_side: query
+
+NEXTQA:
+  metadata:
+    ntp_side: positive
+
+visual7W_pointing_train:
+  metadata:
+    ntp_side: none

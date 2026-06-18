@@ -1,0 +1,8 @@
+type: lora
+r: 16
+alpha: 32
+target_modules: "q_proj,k_proj,v_proj,o_proj,gate_proj,down_proj,up_proj,attn.qkv,attn.
+  proj,mlp.fc1,mlp.fc2,merger.mlp.0,merger.mlp.2"
+dropout: 0.05
+use_dora: true
+auto_infer_modules_to_save: true

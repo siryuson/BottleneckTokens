@@ -1,0 +1,25 @@
+# BToks Model Configuration - Qwen2-VL-2B V1
+#
+# Pipeline: BToksTokenInjector -> Backbone -> BToksPooling -> Normalize
+#
+# Note: PEFT/LoRA configuration should be in training config, not here.
+
+type: BToks
+
+modules:
+  injector:
+    type: BToksTokenInjector
+    num_tokens: 4
+
+  backbone:
+    type: Qwen2VLBackbone
+    model_name_or_path: Qwen/Qwen2-VL-2B-Instruct
+    dtype: bfloat16
+    attn_implementation: flash_attention_2
+    trust_remote_code: true
+
+  pooling:
+    type: BToksPooling
+
+  normalize:
+    type: Normalize

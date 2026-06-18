@@ -1,0 +1,19 @@
+# VLM2Vec Model Configuration - Qwen2.5-VL-3B
+#
+# Pipeline: Backbone -> LastTokenPooling -> Normalize
+
+type: VLM2Emb
+
+modules:
+  backbone:
+    type: Qwen2_5VLBackbone
+    model_name_or_path: Qwen/Qwen2.5-VL-3B-Instruct
+    dtype: bfloat16
+    attn_implementation: flash_attention_2
+    trust_remote_code: true
+
+  pooling:
+    type: LastTokenPooling
+
+  normalize:
+    type: Normalize

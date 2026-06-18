@@ -1,0 +1,122 @@
+site_name: Bottleneck Tokens
+site_description: Open-source reproduction code for Bottleneck Tokens for Unified Multimodal Retrieval.
+use_directory_urls: true
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search
+  - i18n:
+      docs_structure: folder
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          name: English
+          build: true
+          default: true
+          link: /
+          nav:
+            - Home: index.md
+            - Getting Started: guides/getting-started.md
+            - Architecture:
+                - Overview: architecture/overview.md
+                - Module Pipeline: architecture/module-pipeline.md
+                - Registry System: architecture/registry-system.md
+                - Configuration: architecture/config-system.md
+                - Training System: architecture/training-system.md
+                - Data Pipeline: datasets/architecture-data-pipeline.md
+                - Evaluation: architecture/evaluation-system.md
+            - Datasets:
+                - Overview: datasets/index.md
+                - Format Spec: datasets/format-spec.md
+                - Training:
+                    - Overview: datasets/train/index.md
+                    - MMEB: datasets/train/mmeb/index.md
+                    - ViDoRe: datasets/train/vidore/index.md
+                    - VisRAG: datasets/train/visrag/index.md
+                    - LLaVA-Hound: datasets/train/llavahound/index.md
+                - Evaluation:
+                    - Overview: datasets/eval/index.md
+                    - Image: datasets/eval/image/index.md
+                    - Video: datasets/eval/video/index.md
+                    - Visual Document: datasets/eval/visdoc/index.md
+                - Custom Dataset: datasets/guide-custom-dataset.md
+                - Eval Lance Layout: datasets/design-eval-lance-layout.md
+                - Eval Data Conversion: datasets/design-eval-conversion.md
+            - API:
+                - Evaluation: api/evaluation.md
+                - Logging: api/logging.md
+                - Model: api/model.md
+                - Trainer: api/trainer.md
+            - Contributing: developer-guide/contributing.md
+        - locale: zh
+          name: 中文
+          build: true
+          link: /zh/
+          nav:
+            - 首页: index.md
+            - 快速入门: guides/getting-started.md
+            - 架构设计:
+                - 架构总览: architecture/overview.md
+                - 模块管道系统: architecture/module-pipeline.md
+                - 注册表系统: architecture/registry-system.md
+                - 配置系统: architecture/config-system.md
+                - 训练系统: architecture/training-system.md
+                - 数据流程: datasets/architecture-data-pipeline.md
+                - 评估系统: architecture/evaluation-system.md
+            - 数据集:
+                - 总览: datasets/index.md
+                - 格式规范: datasets/format-spec.md
+                - 训练数据集:
+                    - 总览: datasets/train/index.md
+                    - MMEB: datasets/train/mmeb/index.md
+                    - ViDoRe: datasets/train/vidore/index.md
+                    - VisRAG: datasets/train/visrag/index.md
+                    - LLaVA-Hound: datasets/train/llavahound/index.md
+                - 评测数据集:
+                    - 总览: datasets/eval/index.md
+                    - 图像: datasets/eval/image/index.md
+                    - 视频: datasets/eval/video/index.md
+                    - 视觉文档: datasets/eval/visdoc/index.md
+                - 自定义数据集: datasets/guide-custom-dataset.md
+                - 评测 Lance 布局: datasets/design-eval-lance-layout.md
+                - 评测数据转换: datasets/design-eval-conversion.md
+            - API:
+                - Evaluation: api/evaluation.md
+                - Logging: api/logging.md
+                - Model: api/model.md
+                - Trainer: api/trainer.md
+            - 贡献指南: developer-guide/contributing.md
+
+validation:
+  nav:
+    omitted_files: ignore
+  links:
+    not_found: warn
+    anchors: warn
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - toc:
+      permalink: true

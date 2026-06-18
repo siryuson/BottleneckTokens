@@ -1,0 +1,64 @@
+# ================================================================
+# GME-style Preset - Qwen2-VL-2B
+# ================================================================
+# Fair-comparison baseline:
+# - Same dense single-vector architecture as VLM2Vec
+# - Same MMEB optimized training data as the VLM2Vec Qwen2-VL-2B preset
+# - No hard-negative mining
+# - No private or synthetic GME training data
+# ================================================================
+
+output_base: ./output
+
+model:
+  _inherit_: ../models/gme_qwen2vl_2b.yaml
+
+peft:
+  _inherit_: ../peft/lora_default.yaml
+
+processor:
+  type: qwen2_vl
+  processor_name: Qwen/Qwen2-VL-2B-Instruct
+  wrap_visual_tokens_with_boundaries: true
+  image_min_pixels: 3136
+  image_max_pixels: 1003520
+  video_min_pixels: 3136
+  video_max_pixels: 602112
+
+eval:
+  type: mmeb
+  data_path: ${oc.env:VLM2EMB_MMEB_V2_ROOT,./data/MMEB-V2}
+  batch_size: 8
+  num_workers: 0
+
+train:
+  dataset:
+    type: combined
+    datasets:
+      _inherit_: ../datasets/mmeb_train_optimized.yaml
+
+  collator:
+    type: training
+    instruction_policy:
+      enabled: true
+      query_instruction: "Represent the query for retrieving relevant multimodal candidates."
+      corpus_instruction: ""
+      template: "{instruction}\n{text}"
+    use_explicit_negatives: false
+    hard_negative_mining: false
+
+  trainer:
+    type: gme_trainer
+
+  args:
+    _inherit_: ../training/gme_base.yaml
+    output_dir: ${output_base}/${train.args.run_name}
+    run_name: gme_qwen2vl_2b_no_mining
+    per_device_train_batch_size: 128
+    gc_chunk_size: 8
+    eval_strategy: steps
+    eval_steps: 500
+    metric_for_best_model: eval_overall
+    greater_is_better: true
+    ddp_find_unused_parameters: true
+    dataloader_drop_last: true

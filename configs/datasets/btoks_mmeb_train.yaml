@@ -1,0 +1,104 @@
+# BToks dataset layer
+# Keep base dataset definitions in mmeb_train.yaml and only add ntp_side deltas here.
+
+_inherit_: ./mmeb_train.yaml
+
+ImageNet_1K:
+  metadata:
+    ntp_side: positive
+
+N24News:
+  metadata:
+    ntp_side: positive
+
+HatefulMemes:
+  metadata:
+    ntp_side: positive
+
+VOC2007:
+  metadata:
+    ntp_side: positive
+
+SUN397:
+  metadata:
+    ntp_side: positive
+
+OK-VQA:
+  metadata:
+    ntp_side: positive
+
+A-OKVQA:
+  metadata:
+    ntp_side: positive
+
+DocVQA:
+  metadata:
+    ntp_side: positive
+
+InfographicsVQA:
+  metadata:
+    ntp_side: positive
+
+ChartQA:
+  metadata:
+    ntp_side: positive
+
+Visual7W:
+  metadata:
+    ntp_side: positive
+
+VisDial:
+  metadata:
+    ntp_side: query
+
+CIRR:
+  metadata:
+    ntp_side: none
+
+VisualNews_t2i:
+  metadata:
+    ntp_side: query
+
+VisualNews_i2t:
+  metadata:
+    ntp_side: positive
+
+MSCOCO_t2i:
+  metadata:
+    ntp_side: query
+
+MSCOCO_i2t:
+  metadata:
+    ntp_side: positive
+
+NIGHTS:
+  metadata:
+    ntp_side: none
+
+WebQA:
+  metadata:
+    ntp_side: both
+
+MSCOCO:
+  metadata:
+    ntp_side: query
+
+colpali_train_set:
+  metadata:
+    ntp_side: positive
+
+visrag-indomain:
+  metadata:
+    ntp_side: query
+
+video_caption_300k:
+  metadata:
+    ntp_side: positive
+
+video_caption_300k-video:
+  metadata:
+    ntp_side: query
+
+video_qa_240k:
+  metadata:
+    ntp_side: positive

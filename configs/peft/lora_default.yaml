@@ -1,0 +1,18 @@
+# ================================================================
+# Default LoRA Configuration
+# ================================================================
+# Shared LoRA baseline for VLM2Vec and BToks presets.
+#
+# Usage in preset
+#   peft:
+#     _inherit_: ../peft/lora_default.yaml
+#     r: 32  # override if needed
+# ================================================================
+
+type: lora
+r: 16
+alpha: 32
+target_modules: "qkv_proj,o_proj,gate_up_proj,down_proj,k_proj,q_proj,out_proj,v_proj"
+dropout: 0.05
+use_dora: true
+auto_infer_modules_to_save: true

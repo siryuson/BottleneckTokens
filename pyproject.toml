@@ -1,0 +1,185 @@
+# ===== Build Configuration =====
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vlm2emb"
+version = "0.1.0"
+description = "BToks: Bottleneck Tokens for Unified Multimodal Retrieval"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "BToks Authors"},
+]
+keywords = [
+    "bottleneck-tokens",
+    "vision-language",
+    "multimodal",
+    "retrieval",
+    "embeddings",
+    "vlm",
+    "qwen",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    # Core ML dependencies pinned for environment consistency.
+    "torch==2.7.1",
+    "torchvision==0.22.1",
+    "transformers==4.57.3",
+    "accelerate==1.12.0",
+    "peft==0.18.0",
+    "qwen-vl-utils==0.0.14",
+    "huggingface-hub==0.36.0",
+    "datasets==4.4.1",
+    # Utility packages.
+    "pyyaml==6.0.3",
+    "numpy==2.2.6",
+    "pillow==11.3.0",
+    "pyarrow>=18.0.0",
+    "lance>=1.2.1",
+    "pandas>=2.2.0",
+    "tqdm>=4.67.0",
+    "scikit-learn>=1.5.0",
+    "av==16.0.1",
+    "opencv-python==4.12.0.88",
+    "decord==0.6.0",
+    "PyMuPDF>=1.24.0",
+    # Configuration system.
+    "omegaconf>=2.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+]
+
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocs-static-i18n>=1.3",
+]
+
+train = [
+    # Training utilities.
+    "wandb>=0.15.0",
+]
+
+gpu = [
+    # Install versions that match your CUDA/PyTorch environment.
+    "flash-attn>=2.8.0",
+    "deepspeed>=0.18.0",
+]
+
+full = [
+    # All dependency groups combined without a self-reference.
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+    # Documentation dependencies.
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocs-static-i18n>=1.3",
+    # Training dependencies.
+    "wandb>=0.15.0",
+    # Additional runtime dependencies.
+    "decord>=0.6.0",
+    "PyMuPDF>=1.24.0",
+]
+
+[project.urls]
+Paper = "https://arxiv.org/abs/2604.11095"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+vlm2emb = ["py.typed"]
+
+# ===== Ruff Configuration (Linting) =====
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+# Runtime source lives under src/.
+src = ["src"]
+
+exclude = [
+  ".git",
+  ".venv",
+]
+
+[tool.ruff.lint]
+# Keep the public-release lint gate focused on correctness checks that the
+# migrated codebase already satisfies. Import sorting and modernization rules
+# can be tightened in a later cleanup pass.
+select = ["E", "F"]
+
+# Compatibility ignores for the migrated public codebase.
+ignore = [
+  "E501", # Long lines are reviewed separately during documentation/code cleanup.
+  "E402", # Dataset parser modules keep contract docstrings before imports.
+  "F541", # Historical literal-only f-strings are tolerated for now.
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["vlm2emb"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]  # Allow unused imports in __init__.py
+
+# ===== Black Configuration (Formatting) =====
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+
+# ===== Pytest Configuration =====
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks integration tests",
+    "unit: marks unit tests",
+]
+
+# ===== Coverage Configuration =====
+[tool.coverage.run]
+source = ["src/vlm2emb"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
